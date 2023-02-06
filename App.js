@@ -1,18 +1,23 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, Text, View, SafeAreaView } from 'react-native';
 import {Login, Main, Register, Settings} from './screens'
-
+import {FlatListSan} from './components'
+import { useState } from 'react';
+import GlobalStyles from './GlobalStyles';
 export default function App() {
+
   return (
     // <Login></Login>
     // <Settings></Settings>
-    <Main></Main>
+    <SafeAreaView style={GlobalStyles.droidSafeArea}>
+      <FlatListSan></FlatListSan>
+    </SafeAreaView>
     // <Register></Register>
     // <View style={{flex: 1,
     // backgroundColor: 'red'}}><Text></Text></View>
   );
 }
-
+//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
 const styles = StyleSheet.create({
   container: {
     flex: 1,
