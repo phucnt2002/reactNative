@@ -23,12 +23,14 @@ const RightAction = ({progress, dragX, onPress} ) => {
     </TouchableOpacity>
   );
 };
+// function onRightPress () {
+//   alert("Người gì mà dễ thương")
+// }
 function FlatListItem(props) {
   const {item, index} = props
   return (
     <Swipeable 
-      renderRightActions={RightAction}
-      onPress={onRightPress}
+      renderRightActions={(progress, dragX) => <RightAction progress={progress} dragX={dragX} onPress={onRightPress}/>}
     >
       <View
         style={{
@@ -60,11 +62,13 @@ function FlatListSan() {
     <FlatList
       data={san}
       keyExtractor={(item) => item.id}
-      renderItem={({ item }) => {
-        <FlatListItem
-        {...item}
-        //onRightPress={() => alert("Người gì mà dễ thương")}
-        ></FlatListItem>
+      renderItem={({ item, index }) => {
+        
+        return (
+          
+          <FlatListItem item={item} index={index}></FlatListItem>
+          
+        );
       }}
     ></FlatList>
   );
