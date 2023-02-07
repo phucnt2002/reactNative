@@ -1,26 +1,35 @@
-import { FlatList, View, TouchableOpacity, Alert } from "react-native";
+import { FlatList, View, TouchableOpacity, Alert, Animated } from "react-native";
 import { Text, Image } from "react-native";
 import { colors } from "../constants";
 import san from "../data/san";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 
-const LeftAction = () => {
-  console.log("huhu")
+const RightAction = ({progress, dragX, onPress} ) => {
+  const scale = dragX.interpolate({
+    inputRange: [-100, 0],
+    outputRange: [1, 0],
+    extrapolate: 'clamp'
+  })
+  //console.log("huhu")
   return (
-    <View
-      style={{ backgroundColor: "#388e3c", justifyContent: "center", flex: 1 }}
-    >
-      <Text style={{ color: "#fff", fontWeight: "600", padding: 20 }}>
-        Delete
-      </Text>
-    </View>
+    <TouchableOpacity onPress={onPress}>
+      <View
+        style={{ backgroundColor: "#dd2c00", justifyContent: "center", alignItems:'flex-end' }}
+      >
+        <Animated.Text style={[{ color: "#fff", fontWeight: "600",  padding: 20 }, {transform: [{ scale }]}]}>
+          Delete
+        </Animated.Text>
+      </View>
+    </TouchableOpacity>
   );
 };
-
 function FlatListItem(props) {
   const {item, index} = props
   return (
-    <Swipeable renderRightActions={LeftAction}>
+    <Swipeable 
+      renderRightActions={RightAction}
+      onPress={onRightPress}
+    >
       <View
         style={{
           marginHorizontal: 10,
@@ -51,8 +60,11 @@ function FlatListSan() {
     <FlatList
       data={san}
       keyExtractor={(item) => item.id}
-      renderItem={({ item, index }) => {
-        return <FlatListItem item={item} index={index}></FlatListItem>
+      renderItem={({ item }) => {
+        <FlatListItem
+        {...item}
+        //onRightPress={() => alert("Người gì mà dễ thương")}
+        ></FlatListItem>
       }}
     ></FlatList>
   );
