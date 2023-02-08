@@ -13,7 +13,7 @@ import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { StackRouter } from 'react-navigation'
-import {Login, Register, Settings} from '../screens'
+import {Booking, Login, Register, Settings} from '../screens'
 
 import {
     createDrawerNavigator,
@@ -29,9 +29,10 @@ function AppNavigation(props) {
         <Stack.Navigator initialRouteName='Register' screenOptions={{
             headerShown: false
         }}>
-            <Stack.Screen name={"Register"} component={Register}/>
-            <Stack.Screen name={"Login"} component={Login}/>
+            {/* <Stack.Screen name={"Register"} component={Register}/>
+            <Stack.Screen name={"Login"} component={Login}/> */}
             <Stack.Screen name={"UITab"} component={UITab}/>     
+            <Stack.Screen name={"Booking"} component={Booking}/>     
         </Stack.Navigator>
     </NavigationContainer>
 }
