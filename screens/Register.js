@@ -13,6 +13,7 @@ import {
 import {images, colors, icons, fontSizes} from '../constants'
 import Icon from 'react-native-vector-icons/FontAwesome5'
 import {isValidEmail, isValidPassword} from '../utilies/Validations'
+import {auth, firebaseDatabase} from '../firebase/firebase'
 // import {    
 //     onAuthStateChanged,
 //     firebaseDatabaseRef,
@@ -37,6 +38,7 @@ function Register(props) {
                             && password == retypePassword
 
     useEffect(()=>{
+        const xx = auth
         //componentDidMount        
         Keyboard.addListener('keyboardDidShow', () => {            
             setKeyboardIsShown(true)
