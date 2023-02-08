@@ -20,7 +20,7 @@ import DateTimePicker from '@react-native-community/datetimepicker'
 import {FlatListSan} from '../components';
 
 
-function Main(props){
-    return <FlatListSan props={props}></FlatListSan>
+function Chart(props){
+    return 
 }
-export default Main
+export default Chart

@@ -31,7 +31,7 @@ import AddSan from "./AddSan";
 // };
 
 function FlatListItem(props) {
-  const { item, index, deleteItem } = props;
+  const { item, index, deleteItem, onPress } = props;
   const handlerLongClick = () => {
     Alert.alert(
       "Alert",
@@ -53,13 +53,13 @@ function FlatListItem(props) {
     );
   };
 
-  const onPress = () => {
-    alert("Press");
-  };
+
 
   const onPressAdd = () => {
     this.refs.AddSan.show;
   };
+
+
 
   return (
     <Swipeable>
@@ -90,7 +90,8 @@ function FlatListItem(props) {
   );
 }
 
-function FlatListSan() {
+function FlatListSan(props) {
+  props = props.props
   const [data, setData] = useState(san);
   console.log(data);
 
@@ -104,6 +105,8 @@ function FlatListSan() {
 
   const [modalVisible, setModalVisible] = useState(false);
 
+  const {navigation, route} = props
+  const {navigate, goBack} = navigation
   return (
     <View>
       <UIHeader
@@ -123,6 +126,9 @@ function FlatListSan() {
               item={item}
               index={index}
               deleteItem={deleteItem}
+              onPress ={() => {
+                navigate('Booking', {san: item})
+              }}
             ></FlatListItem>
           );
         }}
