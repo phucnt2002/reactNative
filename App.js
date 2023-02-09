@@ -20,7 +20,7 @@ export default function App() {
     // backgroundColor: 'red'}}><Text></Text></View>
   );
 }
-//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
+//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
 const styles = StyleSheet.create({
   container: {
     flex: 1,
