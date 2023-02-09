@@ -13,10 +13,21 @@ import { Text, Image } from "react-native";
 import { colors } from "../constants";
 import san from "../data/san";
 import Swipeable from "react-native-gesture-handler/Swipeable";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import UIHeader from "./UIHeader";
 import AddSan from "./AddSan";
-
+import DropDownPicker from "react-native-dropdown-picker";
+import {
+  onAuthStateChanged,
+  firebaseDatabaseRef,
+  firebaseSet,
+  firebaseDatabase,
+  auth,
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  onValue,
+} from "../firebase/firebase";
+import { async } from "@firebase/util";
 // const LeftAction = () => {
 //   console.log("huhu")
 //   return (
@@ -54,13 +65,6 @@ function FlatListItem(props) {
   };
 
 
-
-  const onPressAdd = () => {
-    this.refs.AddSan.show;
-  };
-
-
-
   return (
     <Swipeable>
       <TouchableOpacity
@@ -81,9 +85,9 @@ function FlatListItem(props) {
           style={{ width: 100, height: 100, margin: 5 }}
         />
         <View>
-          <Text>{`Ten san: ${item.name}`}</Text>
-          <Text>{`Loai san: ${item.type}`}</Text>
-          <Text>{`Gia: ${item.price}`}</Text>
+          <Text>{`Ten san: ${item.nameField}`}</Text>
+          <Text>{`Loai san: ${item.typeField}`}</Text>
+          <Text>{`Gia: ${item.priceField}`}</Text>
         </View>
       </TouchableOpacity>
     </Swipeable>
@@ -91,22 +95,90 @@ function FlatListItem(props) {
 }
 
 function FlatListSan(props) {
-  props = props.props
-  const [data, setData] = useState(san);
-  console.log(data);
+  props = props.props;
+  const responseUser = auth.currentUser;
+
+  const [data, setData] = useState({});
+
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState(null);
+  const [items, setItems] = useState([
+    { label: "San 5", value: "san5" },
+    { label: "San 7", value: "san7" },
+    { label: "San 9", value: "san9" },
+    { label: "San 11", value: "san11" },
+  ]);
+  const [nameField, setNameField] = useState("");
+  const [priceField, setPriceField] = useState("");
 
   const deleteItem = (index) => {
     san.splice(index, 1);
     setData([...san]);
-    alert(`xoa${index}`);
-    console.log(san);
-    console.log(data);
+  };
+
+  const saveOnPress = () => {
+    setModalVisible(!modalVisible);
+    if (responseUser) {
+      let user = {
+        userID: responseUser.uid,
+        san: {
+          nameField: nameField,
+          typeField: value,
+          priceField: priceField,
+        },
+      };
+      firebaseSet(
+        firebaseDatabaseRef(firebaseDatabase, `field/${responseUser.uid}`),
+        user
+      );
+    }
+
+    // onAuthStateChanged(auth, (responseUser) => {
+    //   debugger;
+    //   if (responseUser) {
+    //     let user = {
+    //       userID: responseUser.uid,
+    //       san: {
+    //         nameField: nameField,
+    //         typeField: value,
+    //         priceField: priceField,
+    //       },
+    //     };
+    //     firebaseSet(
+    //       firebaseDatabaseRef(firebaseDatabase, `field/${responseUser.uid}`),
+    //       user
+    //     );
+    //   }
+    // });
   };
 
   const [modalVisible, setModalVisible] = useState(false);
 
-  const {navigation, route} = props
-  const {navigate, goBack} = navigation
+  useEffect(() => {
+    onValue(
+      firebaseDatabaseRef(firebaseDatabase, "field"),
+      async (snapshot) => {
+        if (snapshot.exists()) {
+          let snapshotObject = snapshot.val();
+          const currentUser = responseUser.uid;
+          const dataCurrent = snapshotObject[currentUser]
+          setData([dataCurrent.san])
+          console.log("aa")
+          // const arr = Object.keys(snapshotObject)
+          // debugger
+            // .filter((item) => item.includes(currentUser))
+            // .map((eachKey) => {
+            //   let eachObject = snapshotObject[eachKey];
+            //   debugger;
+            //   return eachObject;
+            // });
+        }
+      }
+    );
+  }, []);
+
+  const { navigation, route } = props;
+  const { navigate, goBack } = navigation;
   return (
     <View>
       <UIHeader
@@ -118,7 +190,7 @@ function FlatListSan(props) {
         }}
       ></UIHeader>
       <FlatList
-        data={san}
+        data={data}
         keyExtractor={(item) => item.id}
         renderItem={({ item, index }) => {
           return (
@@ -126,16 +198,17 @@ function FlatListSan(props) {
               item={item}
               index={index}
               deleteItem={deleteItem}
-              onPress ={() => {
-                navigate('Booking', {san: item})
+              onPress={() => {
+                navigate("Booking", { san: item });
               }}
             ></FlatListItem>
           );
         }}
       ></FlatList>
       <Modal
+        position="bottom"
         animationType="slide"
-        transparent={false}
+        transparent={true}
         visible={modalVisible}
         onRequestClose={() => {
           console.log("close");
@@ -144,24 +217,30 @@ function FlatListSan(props) {
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
             <TextInput
+              onChangeText={(text) => {
+                setNameField(text);
+              }}
               style={styles.input}
-
               placeholder="Ten san"
               placeholderTextColor={colors.placeholder}
             />
-            <TextInput
-              style={{
-                color: "black",
-              }}
-              placeholder="Loai san"
-              placeholderTextColor={colors.placeholder}
+            <DropDownPicker
+              open={open}
+              value={value}
+              items={items}
+              setOpen={setOpen}
+              setValue={setValue}
+              setItems={setItems}
             />
             <TextInput
+              onChangeText={(text) => {
+                setPriceField(text);
+              }}
               style={styles.input}
               placeholder="Gia"
               placeholderTextColor={colors.placeholder}
             />
-            <View style={{flexDirection: 'row'}}>
+            <View style={{ flexDirection: "row" }}>
               <Pressable
                 style={[styles.button, styles.buttonClose, styles.colorRed]}
                 onPress={() => setModalVisible(!modalVisible)}
@@ -171,7 +250,7 @@ function FlatListSan(props) {
 
               <Pressable
                 style={[styles.button, styles.buttonClose]}
-                onPress={() => setModalVisible(!modalVisible)}
+                onPress={saveOnPress}
               >
                 <Text style={styles.textStyle}>Save</Text>
               </Pressable>
@@ -191,7 +270,7 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
   modalView: {
-    width: '80%',
+    width: "80%",
     margin: 20,
     backgroundColor: "white",
     borderRadius: 20,
@@ -217,10 +296,10 @@ const styles = StyleSheet.create({
   buttonClose: {
     backgroundColor: "#2196F3",
     paddingHorizontal: 40,
-    marginHorizontal:5
+    marginHorizontal: 5,
   },
   colorRed: {
-    backgroundColor: 'red'
+    backgroundColor: "red",
   },
   textStyle: {
     color: "white",
@@ -236,8 +315,8 @@ const styles = StyleSheet.create({
     margin: 12,
     borderWidth: 1,
     padding: 10,
-    width: '100%',
-    borderRadius: 10
+    width: "100%",
+    borderRadius: 10,
   },
 });
 export default FlatListSan;

@@ -61,12 +61,13 @@ function Login(props) {
                     email: user.email,
                     tokenKey: user.emailVerified,
                     accessToken: user.accessToken,
-
+                    emailVerified: user.emailVerified
                 })
                 navigate('UITab')
             }
         })
     })
+
     //navigation
     // const {navigation, route} = props
     //functions of navigate to/back
@@ -185,16 +186,14 @@ function Login(props) {
             <TouchableOpacity
                 disabled = {isValidationOK() == false}
                 onPress={() => {
-                    alert(`Email = ${email}, password = ${password}`)
-                    // signInWithEmailAndPassword(auth, email, password)
-                    // .then((userCredential) => {                        
-                    //     const user = userCredential.user  
-                    //     debugger                      
-                    //     navigate('UITab')    
-                    // }).catch((error) => {
-                    //     debugger
-                    //     alert(`Cannot signin, error: ${error.message}`)
-                    // })                    
+                    // alert(`Email = ${email}, password = ${password}`)
+                    signInWithEmailAndPassword(auth, email, password)
+                    .then((userCredential) => {                        
+                        const user = userCredential.user  
+                        navigate('UITab')    
+                    }).catch((error) => {
+                        alert(`Cannot signin, error: ${error.message}`)
+                    })                    
                 }}
                 style={{
                     backgroundColor: isValidationOK() == true 
