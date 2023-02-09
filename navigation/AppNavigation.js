@@ -26,11 +26,11 @@ import UITab from './UITab'
 const Stack = createNativeStackNavigator()
 function AppNavigation(props) {
     return <NavigationContainer>
-        <Stack.Navigator initialRouteName='Register' screenOptions={{
+        <Stack.Navigator initialRouteName='Login' screenOptions={{
             headerShown: false
         }}>
-            {/* <Stack.Screen name={"Register"} component={Register}/>
-            <Stack.Screen name={"Login"} component={Login}/> */}
+            <Stack.Screen name={"Register"} component={Register}/>
+            <Stack.Screen name={"Login"} component={Login}/>
             <Stack.Screen name={"UITab"} component={UITab}/>     
             <Stack.Screen name={"Booking"} component={Booking}/>     
         </Stack.Navigator>

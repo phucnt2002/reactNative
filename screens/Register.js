@@ -13,16 +13,15 @@ import {
 import {images, colors, icons, fontSizes} from '../constants'
 import Icon from 'react-native-vector-icons/FontAwesome5'
 import {isValidEmail, isValidPassword} from '../utilies/Validations'
-import {auth, firebaseDatabase} from '../firebase/firebase'
-// import {    
-//     onAuthStateChanged,
-//     firebaseDatabaseRef,
-//     firebaseSet,
-//     firebaseDatabase,
-//     auth,
-//     createUserWithEmailAndPassword,
-//     sendEmailVerification,
-// } from '../firebase/firebase'
+import {    
+    onAuthStateChanged,
+    firebaseDatabaseRef,
+    firebaseSet,
+    firebaseDatabase,
+    auth,
+    createUserWithEmailAndPassword,
+    sendEmailVerification,
+} from '../firebase/firebase'
 function Register(props) {
     const [keyboardIsShown, setKeyboardIsShown] = useState(false)
     //states for validating
@@ -48,9 +47,9 @@ function Register(props) {
         })               
     })
     //navigation
-    // const {navigation, route} = props
+    const {navigation, route} = props
     //functions of navigate to/back
-    // const {navigate, goBack} = navigation
+    const {navigate, goBack} = navigation
     return <View     
     style={{
         flex: 100,
@@ -69,9 +68,9 @@ function Register(props) {
                 width: '50%'
             }}>Already have an Account?</Text>
             <Image
-                tintColor = {'white'}
+                // tintColor = {'white'}
                 source={
-                    images.computer
+                    images.logo
                 } style={{
                     width: 120,
                     height: 120,
@@ -200,14 +199,12 @@ function Register(props) {
                     createUserWithEmailAndPassword(auth, email, password)
                     .then((userCredential) => {                        
                         const user = userCredential.user
-                        debugger
                         sendEmailVerification(user).then(()=>{
                             console.log('Email verification sent')
                         })                        
                         navigate('UITab')    
 
                     }).catch((error) => {
-                        debugger
                         alert(`Cannot signin, error: ${error.message}`)
                     })
                 }}
@@ -226,6 +223,18 @@ function Register(props) {
                     color: 'white'
                 }}>Register</Text>
             </TouchableOpacity>  
+            <TouchableOpacity
+                onPress={() => {
+                    navigate('Login')
+                }}
+                style={{ padding: 5 }}>
+                <Text style={{
+                    padding: 8,
+                    fontSize: fontSizes.h6,
+                    color: colors.primary,
+                    alignSelf: 'center',
+                }}>Login</Text>
+            </TouchableOpacity>
         </View>
         
         {keyboardIsShown == false ? <View style={{

@@ -13,7 +13,7 @@ import {
 import {images, colors, icons, fontSizes} from '../constants'
 import Icon from 'react-native-vector-icons/FontAwesome5'
 import { UIHeader } from '../components';
-// import {auth, firebaseDatabase, firebaseDatabaseRef} from '../firebase/firebase'
+import {auth, firebaseDatabase, firebaseDatabaseRef} from '../firebase/firebase'
 import {StackActions} from '@react-navigation/native'
 function Settings(props) {
     const [isEnabledLockApp, setEnabledLockApp] = useState(false)
@@ -21,9 +21,9 @@ function Settings(props) {
     const [isEnabledChangePassword, setEnabledChangePassword] = useState(false)
 
     //navigation
-    // const {navigation, route} = props
+    const {navigation, route} = props
     //functions of navigate to/back
-    // const {navigate, goBack} = navigation
+    const {navigate, goBack} = navigation
 
     return <SafeAreaView style={{
         flex: 1,
