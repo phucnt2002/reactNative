@@ -9,16 +9,16 @@ import {
     KeyboardAvoidingView,
     Keyboard
 } from 'react-native'
-// import {    
-//     onAuthStateChanged,
-//     firebaseDatabaseRef,
-//     firebaseSet,
-//     firebaseDatabase,
-//     auth,
-//     createUserWithEmailAndPassword,
-//     sendEmailVerification,
-//     signInWithEmailAndPassword,
-// } from '../firebase/firebase'
+import {    
+    onAuthStateChanged,
+    firebaseDatabaseRef,
+    firebaseSet,
+    firebaseDatabase,
+    auth,
+    createUserWithEmailAndPassword,
+    sendEmailVerification,
+    signInWithEmailAndPassword,
+} from '../firebase/firebase'
 
 import {images, colors, icons, fontSizes} from '../constants'
 import Icon from 'react-native-vector-icons/FontAwesome5'
@@ -42,6 +42,29 @@ function Login(props) {
         })
         Keyboard.addListener('keyboardDidHide', () => {            
             setKeyboardIsShown(false)
+        })
+    })
+
+    const {navigation, route} = props
+    //functions of navigate to/back
+    const {navigate, goBack} = navigation
+
+    useEffect(()=>{
+        onAuthStateChanged(auth, (user)=>{
+            if(user){
+                const userId = user.uid
+                //sava data base
+                firebaseSet(firebaseDatabaseRef(
+                    firebaseDatabase,
+                    `users/${userId}`
+                ), {
+                    email: user.email,
+                    tokenKey: user.emailVerified,
+                    accessToken: user.accessToken,
+
+                })
+                navigate('UITab')
+            }
         })
     })
     //navigation
@@ -190,7 +213,7 @@ function Login(props) {
             </TouchableOpacity>
             <TouchableOpacity
                 onPress={() => {
-                    alert('press register')
+                    navigate('Register')
                 }}
                 style={{ padding: 5 }}>
                 <Text style={{
