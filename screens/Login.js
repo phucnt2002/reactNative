@@ -252,7 +252,6 @@ function Login(props) {
                 <View style={{width: 15}}/>
                 <Icon name='google' size={35} color={colors.google} />
             </View>
-
         </View> : <View style={{
             flex: 25,            
         }}></View>}
