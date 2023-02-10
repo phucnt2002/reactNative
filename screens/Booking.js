@@ -11,6 +11,9 @@ import { FlatListSan } from "../components";
 import Timeline from 'react-native-timeline-flatlist'
 
 import Modal from "react-native-modal";
+import DatePicker from 'react-native-date-picker'
+
+
 
 function Booking(props) {
   const [date, setDate] = useState(new Date());
@@ -23,17 +26,13 @@ function Booking(props) {
 
   const [san, setSan] = useState([
     {
-    
+      
     },
   ]);
-<<<<<<< HEAD
 
-
-  const {key, name, type, price, img} = props.route.params.san
-=======
   const {key, nameField, typeField, priceField, img} = props.route.params.san
->>>>>>> origin/main
   const {navigate, goBack} = props.navigation
+
 
   const onChangeDate = (event, selectedDate) => {
     const currentDate = selectedDate || date;
@@ -52,7 +51,7 @@ function Booking(props) {
     console.log(fDate + "(" + fDate + ")");
   };
   const showModeDate = (currentMode) => {
-    setShow(true);
+    //setShow(true);
     setModeDate(currentMode);
   };
 
@@ -64,7 +63,7 @@ function Booking(props) {
     let fTime = "Hours:" + tempDate.getHours() + " |Minutes: " + tempDate.getMinutes();
   };
   const showModeTimeStart = (currentMode) => {
-    //setShow(true);
+    setShow(true);
     setModeTimeStart(currentMode);
   };
 
@@ -76,7 +75,7 @@ function Booking(props) {
     let fTime = "Hours:" + tempDate.getHours() + " |Minutes: " + tempDate.getMinutes();
   };
   const showModeTimeEnd = (currentMode) => {
-    //setShow(true);
+    setShow(true);
     setModeTimeEnd(currentMode);
   };
 
@@ -92,7 +91,19 @@ function Booking(props) {
 
   const handleModal = () => setIsModalVisible(() => !isModalVisible);
  
-  
+
+  const [currentDate, setCurrentDate] = useState('');
+
+  useEffect(() => {
+    var date = new Date().getDate(); //Current Date
+    var month = new Date().getMonth() + 1; //Current Month
+    var year = new Date().getFullYear(); //Current Year
+    setCurrentDate(
+      date + '/' + month + '/' + year 
+    );
+  }, []);
+
+
   return (
     
     <SafeAreaView
@@ -106,9 +117,8 @@ function Booking(props) {
         rightIconName={"ellipsis-v"}
         onPressLeftIcon={()=>{goBack()}}
       ></UIHeader>
-<<<<<<< HEAD
-
       <View style={styles.container}>
+        <Text style={styles.textStyle}>{currentDate}</Text>
         <Timeline 
           style={styles.list}
           data={data}
@@ -178,54 +188,21 @@ function Booking(props) {
                   mode={modeTimeEnd}
                   is24Hour={true}
                   display="default"
-                  onChange={onChangeTimeEnd}
+                  onChange1={onChangeTimeEnd}
                 />
               )}
 
-
               <Button title="Hide modal" onPress={handleModal} />
             </View>
+            
           </Modal>
 
         </TouchableOpacity>
-       
+        
         </View>
-    
     </SafeAreaView>    
-=======
-      <Text>{text}</Text>
-      <View>
-        <Button
-          onPress={() => showMode("date")}
-          style={{ magrin: "1000" }}
-          title="Date"
-        />
-      </View>
-      <View>
-        <Button
-          onPress={() => showMode("time")}
-          style={{ magrin: "1000" }}
-          title="Time"
-        />
-      </View>
-      {show && (
-        <DateTimePicker
-          testID="dateTimePicker"
-          value={date}
-          mode={mode}
-          is24Hour={true}
-          display="default"
-          onChange={onChange}
-        />
-      )}
-      <View>
-        <Text>{typeField+nameField}</Text>
-      </View>
-    </SafeAreaView>
->>>>>>> origin/main
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -256,8 +233,12 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold'
-  }
+  },
+  textStyle: {
+    textAlign: 'center',
+    fontSize: 28,
+    color: 'black',
+  },
 });
 
 export default Booking 
-
