@@ -26,13 +26,8 @@ function Booking(props) {
     
     },
   ]);
-<<<<<<< HEAD
 
-
-  const {key, name, type, price, img} = props.route.params.san
-=======
   const {key, nameField, typeField, priceField, img} = props.route.params.san
->>>>>>> origin/main
   const {navigate, goBack} = props.navigation
 
   const onChangeDate = (event, selectedDate) => {
@@ -106,8 +101,6 @@ function Booking(props) {
         rightIconName={"ellipsis-v"}
         onPressLeftIcon={()=>{goBack()}}
       ></UIHeader>
-<<<<<<< HEAD
-
       <View style={styles.container}>
         <Timeline 
           style={styles.list}
@@ -190,39 +183,7 @@ function Booking(props) {
         </TouchableOpacity>
        
         </View>
-    
     </SafeAreaView>    
-=======
-      <Text>{text}</Text>
-      <View>
-        <Button
-          onPress={() => showMode("date")}
-          style={{ magrin: "1000" }}
-          title="Date"
-        />
-      </View>
-      <View>
-        <Button
-          onPress={() => showMode("time")}
-          style={{ magrin: "1000" }}
-          title="Time"
-        />
-      </View>
-      {show && (
-        <DateTimePicker
-          testID="dateTimePicker"
-          value={date}
-          mode={mode}
-          is24Hour={true}
-          display="default"
-          onChange={onChange}
-        />
-      )}
-      <View>
-        <Text>{typeField+nameField}</Text>
-      </View>
-    </SafeAreaView>
->>>>>>> origin/main
   );
 }
 
