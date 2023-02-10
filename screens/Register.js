@@ -28,7 +28,7 @@ function Register(props) {
     const [errorEmail, setErrorEmail] = useState('')
     const [errorPassword, setErrorPassword] = useState('')
     //states to store email/password
-    const [email, setEmail] = useState('baluu8njdf@gmail.com')
+    const [email, setEmail] = useState('nguyenphuc2002ok@gmail.com')
     const [password, setPassword] = useState('123456Abc')
     const [retypePassword, setRetypePassword] = useState('123456Abc')
     const isValidationOK = () => email.length > 0 && password.length > 0
@@ -202,6 +202,15 @@ function Register(props) {
                         sendEmailVerification(user).then(()=>{
                             console.log('Email verification sent')
                         })                        
+                        firebaseSet(firebaseDatabaseRef(
+                            firebaseDatabase,
+                            `users/${user.uid}`
+                        ), {
+                            email: user.email,
+                            tokenKey: user.emailVerified,
+                            accessToken: user.accessToken,
+                            emailVerified: user.emailVerified
+                        })
                         navigate('UITab')    
 
                     }).catch((error) => {

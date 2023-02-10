@@ -4,7 +4,7 @@ import {
     onAuthStateChanged,
     createUserWithEmailAndPassword,   
     signInWithEmailAndPassword,
-    sendEmailVerification,  
+    sendEmailVerification,
     //read data from Firebase    
 } from "firebase/auth"
 //ref = reference to a "collection"
