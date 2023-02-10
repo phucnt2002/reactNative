@@ -185,16 +185,16 @@ function Login(props) {
             <TouchableOpacity
                 disabled = {isValidationOK() == false}
                 onPress={() => {
-                    alert(`Email = ${email}, password = ${password}`)
-                    // signInWithEmailAndPassword(auth, email, password)
-                    // .then((userCredential) => {                        
-                    //     const user = userCredential.user  
-                    //     debugger                      
-                    //     navigate('UITab')    
-                    // }).catch((error) => {
-                    //     debugger
-                    //     alert(`Cannot signin, error: ${error.message}`)
-                    // })                    
+                    //alert(`Email = ${email}, password = ${password}`)
+                    signInWithEmailAndPassword(auth, email, password)
+                    .then((userCredential) => {                        
+                        const user = userCredential.user  
+                        debugger                      
+                        navigate('UITab')    
+                    }).catch((error) => {
+                        debugger
+                        alert(`Cannot signin, error: ${error.message}`)
+                    })                    
                 }}
                 style={{
                     backgroundColor: isValidationOK() == true 
@@ -253,7 +253,6 @@ function Login(props) {
                 <View style={{width: 15}}/>
                 <Icon name='google' size={35} color={colors.google} />
             </View>
-
         </View> : <View style={{
             flex: 25,            
         }}></View>}

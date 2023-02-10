@@ -22,10 +22,12 @@
     "react-native-alert-notification": "^0.3.4",
     "react-native-fontawesome": "^7.0.0",
     "react-native-gesture-handler": "^2.9.0",
+    "react-native-modal": "^13.0.1",
     "react-native-modalbox": "^2.0.2",
     "react-native-screens": "^3.19.0",
     "react-native-slider": "^0.11.0",
     "react-native-swipe-gestures": "^1.0.5",
+    "react-native-timeline-flatlist": "^0.8.0",
     "react-navigation": "^4.4.4"
   },
   "devDependencies": {
