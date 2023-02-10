@@ -49,24 +49,24 @@ function Login(props) {
     //functions of navigate to/back
     const {navigate, goBack} = navigation
 
-    useEffect(()=>{
-        onAuthStateChanged(auth, (user)=>{
-            if(user){
-                const userId = user.uid
-                //sava data base
-                firebaseSet(firebaseDatabaseRef(
-                    firebaseDatabase,
-                    `users/${userId}`
-                ), {
-                    email: user.email,
-                    tokenKey: user.emailVerified,
-                    accessToken: user.accessToken,
-                    emailVerified: user.emailVerified
-                })
-                navigate('UITab')
-            }
-        })
-    })
+    // useEffect(()=>{
+    //     onAuthStateChanged(auth, (user)=>{
+    //         if(user){
+    //             const userId = user.uid
+    //             //sava data base
+    //             firebaseSet(firebaseDatabaseRef(
+    //                 firebaseDatabase,
+    //                 `users/${userId}`
+    //             ), {
+    //                 email: user.email,
+    //                 tokenKey: user.emailVerified,
+    //                 accessToken: user.accessToken,
+    //                 emailVerified: user.emailVerified
+    //             })
+    //             navigate('UITab')
+    //         }
+    //     })
+    // })
 
     //navigation
     // const {navigation, route} = props

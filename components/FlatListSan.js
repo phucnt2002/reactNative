@@ -45,8 +45,8 @@ function FlatListItem(props) {
   const { item, index, deleteItem, onPress } = props;
   const handlerLongClick = () => {
     Alert.alert(
-      "Alert",
-      "Are you sure you want to delete?",
+      "Xoa san",
+      `Ban chac chan muon xoa san ${item.nameField}?`,
       [
         {
           text: "No",
@@ -81,7 +81,7 @@ function FlatListItem(props) {
         }}
       >
         <Image
-          source={{ uri: item.img }}
+          source={{ uri: "https://vecgroup.vn/upload_images/images/2021/12/09/kich-thuoc-san-bong-11-nguoi(1).png" }}
           style={{ width: 100, height: 100, margin: 5 }}
         />
         <View>
@@ -98,7 +98,7 @@ function FlatListSan(props) {
   props = props.props;
   const responseUser = auth.currentUser;
 
-  const [data, setData] = useState({});
+  const [data, setData] = useState([]);
 
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(null);
@@ -110,10 +110,20 @@ function FlatListSan(props) {
   ]);
   const [nameField, setNameField] = useState("");
   const [priceField, setPriceField] = useState("");
-
+  const [nullData, setNullData] = useState(true);
   const deleteItem = (index) => {
-    san.splice(index, 1);
-    setData([...san]);
+    data.splice(index, 1);
+    setData(data);
+    if (responseUser) {
+      let user = {
+        userID: responseUser.uid,
+        san: data,
+      };
+      firebaseSet(
+        firebaseDatabaseRef(firebaseDatabase, `field/${responseUser.uid}`),
+        user
+      );
+    }
   };
 
   const saveOnPress = () => {
@@ -121,11 +131,11 @@ function FlatListSan(props) {
     if (responseUser) {
       let user = {
         userID: responseUser.uid,
-        san: {
+        san: [...data, {
           nameField: nameField,
           typeField: value,
           priceField: priceField,
-        },
+        }],
       };
       firebaseSet(
         firebaseDatabaseRef(firebaseDatabase, `field/${responseUser.uid}`),
@@ -162,19 +172,12 @@ function FlatListSan(props) {
           let snapshotObject = snapshot.val();
           const currentUser = responseUser.uid;
           const dataCurrent = snapshotObject[currentUser]
-          setData([dataCurrent.san])
-          console.log("aa")
-          // const arr = Object.keys(snapshotObject)
-          // debugger
-            // .filter((item) => item.includes(currentUser))
-            // .map((eachKey) => {
-            //   let eachObject = snapshotObject[eachKey];
-            //   debugger;
-            //   return eachObject;
-            // });
+          setData(dataCurrent.san)
+          console.log("set data")
         }
       }
     );
+
   }, []);
 
   const { navigation, route } = props;
@@ -189,6 +192,10 @@ function FlatListSan(props) {
           setModalVisible(true);
         }}
       ></UIHeader>
+      {/* {nullData ? : <View style={{flex:1, justifyContent: 'center', alignItems: 'center', color: 'black'}}><Text>Chua co du lieu</Text></View>} */}
+      <View style={{flex:1}}>
+        
+      </View>
       <FlatList
         data={data}
         keyExtractor={(item) => item.id}
@@ -206,7 +213,6 @@ function FlatListSan(props) {
         }}
       ></FlatList>
       <Modal
-        position="bottom"
         animationType="slide"
         transparent={true}
         visible={modalVisible}
@@ -258,6 +264,7 @@ function FlatListSan(props) {
           </View>
         </View>
       </Modal>
+      
     </View>
   );
 }

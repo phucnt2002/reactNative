@@ -29,7 +29,7 @@ function Booking(props) {
     
     },
   ]);
-  const {key, name, type, price, img} = props.route.params.san
+  const {key, nameField, typeField, priceField, img} = props.route.params.san
   const {navigate, goBack} = props.navigation
 
   const onChange = (event, selectedDate) => {
@@ -59,13 +59,12 @@ function Booking(props) {
       }}
     >
       <UIHeader
-        title={name}
+        title={nameField}
         leftIconName={"arrow-left"}
         rightIconName={"ellipsis-v"}
         onPressLeftIcon={()=>{goBack()}}
       ></UIHeader>
       <Text>{text}</Text>
-
       <View>
         <Button
           onPress={() => showMode("date")}
@@ -91,7 +90,7 @@ function Booking(props) {
         />
       )}
       <View>
-        <Text>{type+name}</Text>
+        <Text>{typeField+nameField}</Text>
       </View>
     </SafeAreaView>
   );
