@@ -28,6 +28,7 @@ import {
   onValue,
 } from "../firebase/firebase";
 import { async } from "@firebase/util";
+import dataTime from '../data/dataTime'
 // const LeftAction = () => {
 //   console.log("huhu")
 //   return (
@@ -97,6 +98,7 @@ function FlatListItem(props) {
 function FlatListSan(props) {
   props = props.props;
   const responseUser = auth.currentUser;
+  let snapshotObject
 
   const [data, setData] = useState([]);
 
@@ -135,6 +137,7 @@ function FlatListSan(props) {
           nameField: nameField,
           typeField: value,
           priceField: priceField,
+          dataTime
         }],
       };
       firebaseSet(
@@ -161,7 +164,6 @@ function FlatListSan(props) {
     //   }
     // });
   };
-
   const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
@@ -169,11 +171,10 @@ function FlatListSan(props) {
       firebaseDatabaseRef(firebaseDatabase, "field"),
       async (snapshot) => {
         if (snapshot.exists()) {
-          let snapshotObject = snapshot.val();
+          snapshotObject = snapshot.val();
           const currentUser = responseUser.uid;
           const dataCurrent = snapshotObject[currentUser]
           setData(dataCurrent.san)
-          console.log("set data")
         }
       }
     );
@@ -206,7 +207,7 @@ function FlatListSan(props) {
               index={index}
               deleteItem={deleteItem}
               onPress={() => {
-                navigate("Booking", { san: item });
+                navigate("Booking", { san: item, index: index });
               }}
             ></FlatListItem>
           );
