@@ -1,263 +1,355 @@
-import React, { useState, useEffect } from "react";
-import {Text, View, Image, ImageBackground, TouchableOpacity, TextInput, KeyboardAvoidingView, Keyboard, ScrollView, Button, SafeAreaView, StyleSheet, RefreshControl,
-  ActivityIndicator, TouchableWithoutFeedback, Animated} from "react-native";
+import React, { useState, useEffect, style, useRef } from "react";
+import {
+  Text,
+  View,
+  Image,
+  ImageBackground,
+  TouchableOpacity,
+  TextInput,
+  KeyboardAvoidingView,
+  Keyboard,
+  ScrollView,
+  Button,
+  SafeAreaView,
+  StyleSheet,
+  RefreshControl,
+  ActivityIndicator,
+  TouchableWithoutFeedback,
+  Animated,
+  Dimensions,
+  FlatList,
+  Pressable,
+} from "react-native";
 import { images, colors, icons, fontSizes } from "../constants";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import { isValidEmail, isValidPassword } from "../utilies/Validations";
 import { UIHeader } from "../components";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { FlatListSan } from "../components";
-
-import Timeline from 'react-native-timeline-flatlist'
-
+import { Calendar, CalendarList, Agenda } from "react-native-calendars";
+import Timeline from "react-native-timeline-flatlist";
+import { BookingCalendar } from "react-native-booking-calendar";
+import { DateTime } from "luxon";
 import Modal from "react-native-modal";
-
+import { LocaleConfig } from "react-native-calendars";
+import san from "../data/san";
+import {
+  onAuthStateChanged,
+  firebaseDatabaseRef,
+  firebaseSet,
+  firebaseDatabase,
+  auth,
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  onValue,
+} from "../firebase/firebase";
+LocaleConfig.locales["fr"] = {
+  monthNames: [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ],
+  monthNamesShort: [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ],
+  dayNames: [
+    "Monday",
+    "Tuesday",
+    "Wesday",
+    "Mercredi",
+    "Jeudi",
+    "Vendredi",
+    "Samedi",
+  ],
+  dayNamesShort: ["Mon", "Tues", "Wed", "Thu", "Fri", "Sat", "Sun"],
+  today: "Today",
+};
+LocaleConfig.defaultLocale = "fr";
 function Booking(props) {
-  const [date, setDate] = useState(new Date());
-  const [modeDate, setModeDate] = useState("date");
-  const [modeTimeStart, setModeTimeStart] = useState("time");
-  const [modeTimeEnd, setModeTimeEnd] = useState("time");
+  const { key, nameField, typeField, priceField, img, dataTime } =
+    props.route.params.san;
+  const  index  = props.route.params.index;
+  const responseUser = auth.currentUser;
+  console.log(responseUser)
+  const { navigate, goBack } = props.navigation;
+  const [data, setData] = useState(dataTime);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [nameCus, setNameCus] = useState("");
+  const [phoneCus, setPhoneCus] = useState("");
 
-  const [show, setShow] = useState(false);
-  const [text, setText] = useState("Empty");
-
-  const [san, setSan] = useState([
-    {
-    
-    },
-  ]);
-<<<<<<< HEAD
-
-
-  const {key, name, type, price, img} = props.route.params.san
-=======
-  const {key, nameField, typeField, priceField, img} = props.route.params.san
->>>>>>> origin/main
-  const {navigate, goBack} = props.navigation
-
-  const onChangeDate = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    setShow(Platform.OS === "ios");
-    setDate(currentDate);
-    let tempDate = new Date(currentDate);
-    let fDate =
-      tempDate.getDate() +
-      "/" +
-      (tempDate.getMonth() + 1) +
-      "/" +
-      tempDate.getFullYear();
-    let fTime =
-      "Hours:" + tempDate.getHours() + " |Minutes: " + tempDate.getMinutes();
-    setText(fDate + "\n" + fTime);
-    console.log(fDate + "(" + fDate + ")");
-  };
-  const showModeDate = (currentMode) => {
-    setShow(true);
-    setModeDate(currentMode);
+  const dataFireBase = useRef();
+  useEffect(() => {
+    onValue(
+      firebaseDatabaseRef(firebaseDatabase, "field"),
+      async (snapshot) => {
+        if (snapshot.exists()) {
+          snapshotObject = snapshot.val();
+          dataFireBase.current = snapshotObject
+        }
+      }
+    );
+  }, []);
+  const onPressBooking = () => {
+    setModalVisible(true);
+    setNameCus("")
+    setPhoneCus("")
   };
 
-  const onChangeTimeStart = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    setShow(Platform.OS === "ios");
-    setDate(currentDate);
-    let tempDate = new Date(currentDate);
-    let fTime = "Hours:" + tempDate.getHours() + " |Minutes: " + tempDate.getMinutes();
-  };
-  const showModeTimeStart = (currentMode) => {
-    //setShow(true);
-    setModeTimeStart(currentMode);
+  const saveOnPress = () => {
+    if (nameCus == "" || phoneCus == "") {
+      alert("Chua dien ten khach hang hoac So dien thoai");
+      return;
+    } else {
+      data.map((item)=>{
+        if(item.isBooking==null){
+          item.isBooking = true
+        }else if(item.isBooking==false){
+          item.isBooking = false
+        }
+      })
+      dataFireBase.current[auth.currentUser.uid].san[index].dataTime = data
+      console.log(dataFireBase)
+      firebaseSet(
+        firebaseDatabaseRef(firebaseDatabase, `field`),
+        dataFireBase.current
+      );
+      setModalVisible(false);
+      console.log(dataTime);
+    }
   };
 
-  const onChangeTimeEnd = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    setShow(Platform.OS === "ios");
-    setDate(currentDate);
-    let tempDate = new Date(currentDate);
-    let fTime = "Hours:" + tempDate.getHours() + " |Minutes: " + tempDate.getMinutes();
-  };
-  const showModeTimeEnd = (currentMode) => {
-    //setShow(true);
-    setModeTimeEnd(currentMode);
-  };
-
-  const data = [
-    {time: '9:00', title: 'Event1', description: 'Event1 Description'},
-    {time: '10:00', title: 'Event2', description: 'Event2 Description'},
-    {time: '11:00', title: 'Event3', description: 'Event3 Description'},
-    {time: '12:00', title: 'Event4', description: 'Event4 Description'},
-    {time: '13:00', title: 'Event5', description: 'Event5 Description'}
-  ]
-  
-  const [isModalVisible, setIsModalVisible] = React.useState(false);
-
-  const handleModal = () => setIsModalVisible(() => !isModalVisible);
- 
-  
+  console.log("reder");
   return (
-    
-    <SafeAreaView
-      style={{
-        flex: 1,
-      }}
-    >
+    <View>
       <UIHeader
         title={nameField}
         leftIconName={"arrow-left"}
         rightIconName={"ellipsis-v"}
-        onPressLeftIcon={()=>{goBack()}}
+        onPressLeftIcon={() => {
+          goBack();
+        }}
       ></UIHeader>
-<<<<<<< HEAD
-
-      <View style={styles.container}>
-        <Timeline 
-          style={styles.list}
-          data={data}
-          separator={true}
-          circleSize={20}
-          circleColor='rgb(45,156,219)'
-          lineColor='rgb(45,156,219)'
-          timeStyle={{textAlign: 'center', backgroundColor:'#ff9797', color:'white', padding:5, borderRadius:13, overflow: 'hidden'}}
-          descriptionStyle={{color:'gray'}}
-          options={{
-            style:{paddingTop:5}
+      <CalendarList
+        // Enable horizontal scrolling, default = false
+        horizontal={true}
+        // Enable paging on horizontal, default = false
+        pagingEnabled={true}
+        // Set custom calendarWidth.
+        calendarWidth={Dimensions.get("window").width}
+        calendarHeight={Dimensions.get("window").height * 0.4}
+      />
+      {/* <ScrollView>
+        <BookingCalendar
+          defaultRow={defaultRow}
+          startDate={startDate}
+          startTime={startTime}
+          endTime={endTime}
+          intervalMinutes={30}
+          dateTime={dateTimeObj}
+          backgroundColor="#e0e0e0"
+          borderColor="pink"
+          fontColor="blue"
+        />
+      </ScrollView> */}
+      <FlatList
+        horizontal={true}
+        data={data}
+        keyExtractor={(item) => item.key}
+        renderItem={({ item, index }) => {
+          return item.isBooking != true ? (
+            <TouchableOpacity
+              onPress={() => {
+                data.map((item) => {
+                  item.isBooking != true
+                    ? (item.isBooking = false)
+                    : (item.isBooking = item.isBooking);
+                });
+                data[index].isBooking == null
+                  ? (data[index].isBooking = false)
+                  : (data[index].isBooking = null);
+                const newData = [...data];
+                setData(newData);
+              }}
+              style={{
+                padding: 10,
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+                opacity: item.isBooking == null ? 0.2 : 1,
+              }}
+            >
+              <Image
+                style={{
+                  width: 50,
+                  height: 50,
+                  resizeMode: "cover",
+                  borderRadius: 25,
+                }}
+                source={{
+                  uri: "https://vecgroup.vn/upload_images/images/2021/12/09/kich-thuoc-san-bong-11-nguoi(1).png",
+                }}
+              />
+              <Text>{item.time}</Text>
+            </TouchableOpacity>
+          ) : (
+            <View />
+          );
+        }}
+      />
+      <View style={{ ustifyContent: "center", alignItems: "center" }}>
+        <TouchableOpacity
+          style={{
+            backgroundColor: colors.primary,
+            padding: 15,
+            width: Dimensions.get("window").width * 0.8,
+            justifyContent: "center",
+            alignItems: "center",
+            borderRadius: 20,
           }}
-        />
-      </View>
-
-      <View style={styles.background}>
-        <TouchableOpacity onPress={handleModal} style={styles.containerButton}>
-          <Text style={styles.textButton}>Đặt giờ</Text>
-          
-          <Modal isVisible={isModalVisible}>
-            <View style={{ height: 500, backgroundColor: '#fff', borderRadius: 20 }}>
-              <View>
-                <Button
-                  onPress={() => showModeDate("date")}
-                  style={{ magrin: "1000" }}
-                  title="Date"
-                />
-              </View>
-              {show && (
-                <DateTimePicker
-                  testID="dateTimePicker"
-                  value={date}
-                  mode={modeDate}
-                  is24Hour={true}
-                  display="default"
-                  onChange={onChangeDate}
-                />
-              )}
-              <View>
-                <Button
-                  onPress={() => showModeTimeStart("time")}
-                  style={{ magrin: "1000" }}
-                  title="Time Start"
-                />
-              </View>
-              {show && (
-                <DateTimePicker
-                  testID="dateTimePicker"
-                  value={date}
-                  mode={modeTimeStart}
-                  is24Hour={true}
-                  display="default"
-                  onChange={onChangeTimeStart}
-                />
-              )}
-              <View>
-                <Button
-                  onPress={() => showModeTimeEnd("time")}
-                  style={{ magrin: "1000" }}
-                  title="Time End"
-                />
-              </View>
-              {show && (
-                <DateTimePicker
-                  testID="dateTimePicker"
-                  value={date}
-                  mode={modeTimeEnd}
-                  is24Hour={true}
-                  display="default"
-                  onChange={onChangeTimeEnd}
-                />
-              )}
-
-
-              <Button title="Hide modal" onPress={handleModal} />
-            </View>
-          </Modal>
-
+          onPress={onPressBooking}
+        >
+          <Text style={{ fontSize: fontSizes.h3, color: "white" }}>
+            Booking
+          </Text>
         </TouchableOpacity>
-       
+      </View>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          console.log("close");
+        }}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text>Xac nhan dat san</Text>
+            <Text>Thong tin khach hang</Text>
+            <TextInput
+              onChangeText={(text) => {
+                setNameCus(text);
+              }}
+              style={styles.input}
+              placeholder="Ten khach hang"
+              placeholderTextColor={colors.placeholder}
+            />
+            <TextInput
+              onChangeText={(text) => {
+                setPhoneCus(text);
+              }}
+              style={styles.input}
+              placeholder="So Dien Thoai"
+              placeholderTextColor={colors.placeholder}
+            />
+            <View style={{ flexDirection: "row" }}>
+              <Pressable
+                style={[styles.button, styles.buttonClose, styles.colorRed]}
+                onPress={() => setModalVisible(!modalVisible)}
+              >
+                <Text style={styles.textStyle}>Cancel</Text>
+              </Pressable>
+
+              <Pressable
+                style={[styles.button, styles.buttonClose]}
+                onPress={saveOnPress}
+              >
+                <Text style={styles.textStyle}>Booking</Text>
+              </Pressable>
+            </View>
+          </View>
         </View>
-    
-    </SafeAreaView>    
-=======
-      <Text>{text}</Text>
-      <View>
-        <Button
-          onPress={() => showMode("date")}
-          style={{ magrin: "1000" }}
-          title="Date"
-        />
-      </View>
-      <View>
-        <Button
-          onPress={() => showMode("time")}
-          style={{ magrin: "1000" }}
-          title="Time"
-        />
-      </View>
-      {show && (
-        <DateTimePicker
-          testID="dateTimePicker"
-          value={date}
-          mode={mode}
-          is24Hour={true}
-          display="default"
-          onChange={onChange}
-        />
-      )}
-      <View>
-        <Text>{typeField+nameField}</Text>
-      </View>
-    </SafeAreaView>
->>>>>>> origin/main
+      </Modal>
+    </View>
   );
 }
-
-
+{
+  /* <CalendarList
+  // Enable horizontal scrolling, default = false
+  horizontal={true}
+  // Enable paging on horizontal, default = false
+  pagingEnabled={true}
+  // Set custom calendarWidth.
+  calendarWidth={Dimensions.get('window').width}
+  calendarHeight={Dimensions.get('window').height*0.4}
+/> */
+}
 const styles = StyleSheet.create({
-  container: {
+  centeredView: {
     flex: 1,
-    padding: 20,
-		backgroundColor:'white'
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22,
+    backgroundColor: "transparent",
   },
-  background: {
-    backgroundColor:'white',
-    alignItems: 'center',
-  },
-  list: {
-    flex: 1,
-    marginTop:20,
-  },
-  containerButton: {
-    marginVertical: 10,
-    height: 30,
-    width: 150,
-    marginHorizontal: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
+  modalView: {
+    width: "90%",
+    margin: 20,
+    backgroundColor: "white",
     borderRadius: 20,
-    backgroundColor: '#ff9797'
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
-  textButton: {
-    textTransform: 'uppercase',
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold'
-  }
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+  },
+  buttonOpen: {
+    backgroundColor: "#F194FF",
+  },
+  buttonClose: {
+    backgroundColor: "#2196F3",
+    paddingHorizontal: 40,
+    marginHorizontal: 5,
+  },
+  colorRed: {
+    backgroundColor: "red",
+  },
+  textStyle: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center",
+  },
+  input: {
+    height: 40,
+    margin: 12,
+    borderWidth: 1,
+    padding: 10,
+    width: "100%",
+    borderRadius: 10,
+  },
 });
-
-export default Booking 
-
+export default Booking;
