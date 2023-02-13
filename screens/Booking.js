@@ -19,6 +19,7 @@ import {
   Dimensions,
   FlatList,
   Pressable,
+  Alert,
 } from "react-native";
 import { images, colors, icons, fontSizes } from "../constants";
 import Icon from "react-native-vector-icons/FontAwesome5";
@@ -90,15 +91,33 @@ function Booking(props) {
     props.route.params.san;
   const  index  = props.route.params.index;
   const responseUser = auth.currentUser;
-  console.log(responseUser)
   const { navigate, goBack } = props.navigation;
   const [data, setData] = useState(dataTime);
   const [modalVisible, setModalVisible] = useState(false);
   const [nameCus, setNameCus] = useState("");
   const [phoneCus, setPhoneCus] = useState("");
+  const [daySelect, setDaySelect] = useState("")
 
+  const timeChecked = useRef();
   const dataFireBase = useRef();
+  const timeCalender = useRef();
+  const bookingTable = useRef();
+  console.log("rerender")
+
+  // useEffect(()=>{
+  //   onValue(
+  //     firebaseDatabaseRef(firebaseDatabase, "bookingTable"),
+  //     async (snapshot) => {
+  //       if (snapshot.exists()) {
+  //         snapshotObject = snapshot.val();
+  //         bookingTable.current = snapshotObject
+  //         debugger
+  //       }
+  //     }
+  //   );
+  // }, [])
   useEffect(() => {
+    console.log("useEffect")
     onValue(
       firebaseDatabaseRef(firebaseDatabase, "field"),
       async (snapshot) => {
@@ -108,11 +127,16 @@ function Booking(props) {
         }
       }
     );
+
   }, []);
   const onPressBooking = () => {
-    setModalVisible(true);
-    setNameCus("")
-    setPhoneCus("")
+    if(timeChecked.current){
+      setModalVisible(true);
+      setPhoneCus("")
+      setNameCus("")
+    }else{
+      alert("Chon thoi gian")
+    }
   };
 
   const saveOnPress = () => {
@@ -120,6 +144,14 @@ function Booking(props) {
       alert("Chua dien ten khach hang hoac So dien thoai");
       return;
     } else {
+      const bookingTable = {
+        nameField: nameField,
+        priceField: priceField,
+        typeField: typeField,
+        userID: auth.currentUser.uid,
+        timeHourseBookinged: data.findIndex((item)=> item.isBooking==null),
+        timeCalenderSelect: timeCalender.current
+      }
       data.map((item)=>{
         if(item.isBooking==null){
           item.isBooking = true
@@ -129,17 +161,19 @@ function Booking(props) {
         }
       })
       dataFireBase.current[auth.currentUser.uid].san[index].dataTime = data
-      console.log(dataFireBase)
       firebaseSet(
         firebaseDatabaseRef(firebaseDatabase, `field`),
         dataFireBase.current
       );
+
+      firebaseSet(
+        firebaseDatabaseRef(firebaseDatabase, `bookingTable/${timeCalender.current}`),
+        [bookingTable]
+      );
       setModalVisible(false);
-      console.log(dataTime);
     }
   };
 
-  console.log("reder");
   return (
     <View>
       <UIHeader
@@ -152,8 +186,13 @@ function Booking(props) {
       ></UIHeader>
       <CalendarList
         onDayPress={day => {
-          console.log('selected day', day);
+          const newDay = {
+            [day.dateString]: {selected: true, marked: true, selectedColor: 'blue'}
+          }
+          setDaySelect(newDay)
+          timeCalender.current = day.timestamp
         }}
+        markedDates={daySelect}
         // Enable horizontal scrolling, default = false
         horizontal={true}
         // Enable paging on horizontal, default = false
@@ -183,6 +222,8 @@ function Booking(props) {
           return item.isBooking != true ? (
             <TouchableOpacity
               onPress={() => {
+                console.log(timeChecked.current)
+                timeChecked.current = true
                 data.map((item) => {
                   item.isBooking != true
                     ? (item.isBooking = false)
