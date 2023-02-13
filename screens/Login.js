@@ -29,7 +29,7 @@ function Login(props) {
     const [errorEmail, setErrorEmail] = useState('')
     const [errorPassword, setErrorPassword] = useState('')
     //states to store email/password
-    const [email, setEmail] = useState('baluu8njdf@gmail.com')
+    const [email, setEmail] = useState('nguyenphuc2002ok@gmail.com')
     const [password, setPassword] = useState('123456Abc')
     const isValidationOK = () => email.length > 0 && password.length > 0
                             && isValidEmail(email) == true

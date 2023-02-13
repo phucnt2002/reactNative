@@ -123,8 +123,9 @@ function Booking(props) {
       data.map((item)=>{
         if(item.isBooking==null){
           item.isBooking = true
-        }else if(item.isBooking==false){
-          item.isBooking = false
+          item.name = nameCus
+          item.phone = phoneCus
+          item.timeStamp = Date.now()
         }
       })
       dataFireBase.current[auth.currentUser.uid].san[index].dataTime = data
@@ -150,6 +151,9 @@ function Booking(props) {
         }}
       ></UIHeader>
       <CalendarList
+        onDayPress={day => {
+          console.log('selected day', day);
+        }}
         // Enable horizontal scrolling, default = false
         horizontal={true}
         // Enable paging on horizontal, default = false

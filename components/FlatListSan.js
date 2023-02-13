@@ -131,19 +131,36 @@ function FlatListSan(props) {
   const saveOnPress = () => {
     setModalVisible(!modalVisible);
     if (responseUser) {
-      let user = {
-        userID: responseUser.uid,
-        san: [...data, {
-          nameField: nameField,
-          typeField: value,
-          priceField: priceField,
-          dataTime
-        }],
-      };
-      firebaseSet(
-        firebaseDatabaseRef(firebaseDatabase, `field/${responseUser.uid}`),
-        user
-      );
+      debugger
+      try{
+        let user = {
+          userID: responseUser.uid,
+          san: [...data, {
+            nameField: nameField,
+            typeField: value,
+            priceField: priceField,
+            dataTime
+          }],
+        };
+        firebaseSet(
+          firebaseDatabaseRef(firebaseDatabase, `field/${responseUser.uid}`),
+          user
+        );
+      }catch{
+        let user = {
+          userID: responseUser.uid,
+          san: [{
+            nameField: nameField,
+            typeField: value,
+            priceField: priceField,
+            dataTime
+          }],
+        };
+        firebaseSet(
+          firebaseDatabaseRef(firebaseDatabase, `field/${responseUser.uid}`),
+          user
+        );
+      }
     }
 
     // onAuthStateChanged(auth, (responseUser) => {
