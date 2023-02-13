@@ -87,9 +87,9 @@ function FlatListItem(props) {
           style={{ width: 100, height: 100, margin: 5 }}
         />
         <View>
-          <Text>{`Ten san: ${item.nameField}`}</Text>
-          <Text>{`Loai san: ${item.typeField}`}</Text>
-          <Text>{`Gia: ${item.priceField}`}</Text>
+          <Text>{`Tên sân: ${item.nameField}`}</Text>
+          <Text>{`Loại sân: ${item.typeField}`}</Text>
+          <Text>{`Giá: ${item.priceField}`}</Text>
         </View>
       </TouchableOpacity>
     </Swipeable>
@@ -106,10 +106,10 @@ function FlatListSan(props) {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(null);
   const [items, setItems] = useState([
-    { label: "San 5", value: "san5" },
-    { label: "San 7", value: "san7" },
-    { label: "San 9", value: "san9" },
-    { label: "San 11", value: "san11" },
+    { label: "Sân 5", value: "san5" },
+    { label: "Sân 7", value: "san7" },
+    { label: "Sân 9", value: "san9" },
+    { label: "Sân 11", value: "san11" },
   ]);
   const [nameField, setNameField] = useState("");
   const [priceField, setPriceField] = useState("");
@@ -246,7 +246,7 @@ function FlatListSan(props) {
                 setNameField(text);
               }}
               style={styles.input}
-              placeholder="Ten san"
+              placeholder="Tên sân"
               placeholderTextColor={colors.placeholder}
             />
             <DropDownPicker
@@ -256,14 +256,16 @@ function FlatListSan(props) {
               setOpen={setOpen}
               setValue={setValue}
               setItems={setItems}
+              placeholder="Chọn loại sân"
             />
             <TextInput
               onChangeText={(text) => {
                 setPriceField(text);
               }}
               style={styles.input}
-              placeholder="Gia"
+              placeholder="Giá"
               placeholderTextColor={colors.placeholder}
+              keyboardType="numeric"
             />
             <View style={{ flexDirection: "row" }}>
               <Pressable

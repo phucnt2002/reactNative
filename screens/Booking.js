@@ -145,7 +145,7 @@ function Booking(props) {
       <UIHeader
         title={nameField}
         leftIconName={"arrow-left"}
-        rightIconName={"ellipsis-v"}
+        //rightIconName={"ellipsis-v"}
         onPressLeftIcon={() => {
           goBack();
         }}
@@ -248,14 +248,14 @@ function Booking(props) {
       >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <Text>Xac nhan dat san</Text>
-            <Text>Thong tin khach hang</Text>
+            <Text>Xác nhận đặt sân</Text>
+            <Text>Thông tin khách hàng</Text>
             <TextInput
               onChangeText={(text) => {
                 setNameCus(text);
               }}
               style={styles.input}
-              placeholder="Ten khach hang"
+              placeholder="Tên khách hàng"
               placeholderTextColor={colors.placeholder}
             />
             <TextInput
@@ -263,7 +263,8 @@ function Booking(props) {
                 setPhoneCus(text);
               }}
               style={styles.input}
-              placeholder="So Dien Thoai"
+              placeholder="Số điện thoại"
+              keyboardType="numeric"
               placeholderTextColor={colors.placeholder}
             />
             <View style={{ flexDirection: "row" }}>
