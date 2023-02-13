@@ -209,9 +209,9 @@ function Booking(props) {
                   resizeMode: "cover",
                   borderRadius: 25,
                 }}
-                source={{
-                  uri: "https://vecgroup.vn/upload_images/images/2021/12/09/kich-thuoc-san-bong-11-nguoi(1).png",
-                }}
+                source={
+                   images.time
+                }
               />
               <Text>{item.time}</Text>
             </TouchableOpacity>
@@ -223,7 +223,7 @@ function Booking(props) {
       <View style={{ ustifyContent: "center", alignItems: "center" }}>
         <TouchableOpacity
           style={{
-            backgroundColor: colors.primary,
+            backgroundColor: '#5567C9',
             padding: 15,
             width: Dimensions.get("window").width * 0.8,
             justifyContent: "center",

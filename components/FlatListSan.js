@@ -80,6 +80,11 @@ function FlatListItem(props) {
           //backgroundColor: index % 2 == 0 ? colors.primary : colors.inactive,
           backgroundColor: '#8D9AC5',
           borderRadius: 10,
+          shadowColor: '#000',
+          shadowOffset: { width: 1, height: 1 },
+          shadowOpacity:  0.4,
+          shadowRadius: 3,
+          elevation: 5,
         }}
       >
         <Image
@@ -221,6 +226,7 @@ function FlatListSan(props) {
         renderItem={({ item, index }) => {
           return (
             <FlatListItem
+              
               item={item}
               index={index}
               deleteItem={deleteItem}

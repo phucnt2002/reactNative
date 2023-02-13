@@ -83,7 +83,8 @@ function Login(props) {
             flex: 30,
             flexDirection: 'row',            
             justifyContent: 'space-around',
-            alignItems: 'center'
+            alignItems: 'center',
+            
         }}>
             <Text style={{
                 color: 'black',
@@ -109,6 +110,11 @@ function Login(props) {
             marginRight: 10,
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
+            shadowColor: '#000',
+            shadowOffset: { width: 1, height: 1 },
+            shadowOpacity:  0.4,
+            shadowRadius: 3,
+            elevation: 5,
 
         }}>
             <View style={{
