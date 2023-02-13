@@ -1,4 +1,4 @@
-const timeCurent = Date.now();
+let timeCurent = Date.now();
 const dataTime = [
     {
       isBooking: false,

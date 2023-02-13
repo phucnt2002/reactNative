@@ -137,10 +137,10 @@ function FlatListSan(props) {
   const saveOnPress = () => {
     setModalVisible(!modalVisible);
     if (responseUser) {
-      debugger
       try{
         let user = {
           userID: responseUser.uid,
+          timeNow: Date.now(),
           san: [...data, {
             nameField: nameField,
             typeField: value,
@@ -155,6 +155,7 @@ function FlatListSan(props) {
       }catch{
         let user = {
           userID: responseUser.uid,
+          timeNow: Date.now(),
           san: [{
             nameField: nameField,
             typeField: value,
