@@ -17,7 +17,7 @@ function UIHeader(props) {
     } = props
     return <View style={{
         height: 55,
-        backgroundColor: colors.primary,
+        backgroundColor: '#5567C9',
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -27,13 +27,18 @@ function UIHeader(props) {
             style={{ padding: 10 }}
             size={23} color={'white'}
             onPress={onPressLeftIcon}
-        /> : <View style={{width: 50, height: 50 }}/>}
+        /> : 
+        <View style={{width: 50, height: 50 }}/>}
+
         <Text style={{
             fontSize: fontSizes.h5,
+            textTransform: 'uppercase',
+            fontWeight: 'bold',
             alignSelf:'center',
-            lineHeight: 45,
+            lineHeight: 40,
             color: 'white'
         }}>{title}</Text>
+
         {rightIconName != undefined ? <Icon            
             name={rightIconName}
             style={{ padding: 10 }}

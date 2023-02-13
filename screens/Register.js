@@ -53,7 +53,7 @@ function Register(props) {
     return <View     
     style={{
         flex: 100,
-        backgroundColor: colors.primary
+        backgroundColor: 'white'
     }}>
         <View style={{
             flex: 25,
@@ -62,7 +62,7 @@ function Register(props) {
             alignItems: 'center'
         }}>
             <Text style={{
-                color: 'white',
+                color: 'black',
                 fontSize: fontSizes.h2,
                 fontWeight: 'bold',
                 width: '50%'
@@ -72,14 +72,14 @@ function Register(props) {
                 source={
                     images.logo
                 } style={{
-                    width: 120,
+                    width: 130,
                     height: 120,
                     alignSelf: 'center'
                 }} />
         </View>
         <View style={{
-            flex: 45,
-            backgroundColor: 'white',
+            flex: 40,
+            backgroundColor: '#001949',
             padding: 10,
             margin: 10,
             borderRadius: 20,
@@ -88,8 +88,9 @@ function Register(props) {
                 marginHorizontal: 15
             }}>
                 <Text style={{
-                    fontSize: fontSizes.h6,
-                    color: colors.primary
+                    fontSize: 18,
+                    color: 'white',
+                    marginTop: 25
                 }}>Email:</Text>
                 <TextInput
                     onChangeText={(text)=>{
@@ -105,14 +106,15 @@ function Register(props) {
                        setEmail(text)    
                     }}
                     style={{
-                        color: 'black'
+                        color: 'white',
+                        marginTop: 5
                     }}
                     placeholder='example@gmail.com'
                     value={email}
                     placeholderTextColor={colors.placeholder}
                 />
                 <View style={{height: 1, 
-                    backgroundColor: colors.primary, 
+                    backgroundColor: '#E17A8D', 
                     width: '100%',                    
                     marginHorizontal: 15,
                     marginBottom: 5,
@@ -128,8 +130,8 @@ function Register(props) {
                 marginHorizontal: 15
             }}>
                 <Text style={{
-                    fontSize: fontSizes.h6,
-                    color: colors.primary
+                    fontSize: 18,
+                    color: 'white'
                 }}>Password:</Text>
                 <TextInput
                     onChangeText={(text)=>{
@@ -138,7 +140,7 @@ function Register(props) {
                         setPassword(text)    
                     }}
                     style={{
-                        color: 'black'
+                        color: 'white'
                     }}
                     secureTextEntry={true}
                     value={password}
@@ -146,7 +148,7 @@ function Register(props) {
                     placeholderTextColor={colors.placeholder}
                 />
                 <View style={{height: 1, 
-                    backgroundColor: colors.primary, 
+                    backgroundColor: '#E17A8D', 
                     width: '100%',
                     marginBottom: 10,
                     marginHorizontal: 15,
@@ -162,8 +164,8 @@ function Register(props) {
                 marginHorizontal: 15,
             }}>
                 <Text style={{
-                    fontSize: fontSizes.h6,
-                    color: colors.primary
+                    fontSize: 18,
+                    color: 'white'
                 }}>Retype password:</Text>
                 <TextInput
                     onChangeText={(text)=>{
@@ -172,7 +174,7 @@ function Register(props) {
                         setRetypePassword(text)                                    
                     }}
                     style={{
-                        color: 'black'
+                        color: 'white'
                     }}
                     value={retypePassword}
                     secureTextEntry={true}
@@ -180,7 +182,7 @@ function Register(props) {
                     placeholderTextColor={colors.placeholder}
                 />
                 <View style={{height: 1, 
-                    backgroundColor: colors.primary, 
+                    backgroundColor: '#E17A8D', 
                     width: '100%',
                     marginBottom: 10,
                     marginHorizontal: 15,
@@ -219,12 +221,13 @@ function Register(props) {
                 }}
                 style={{
                     backgroundColor: isValidationOK() == true 
-                                        ? colors.primary: colors.inactive,
+                                        ? '#E17A8D': colors.inactive,
                     justifyContent: 'center',
                     alignItems: 'center',
                     width: '50%',
                     alignSelf: 'center',
-                    borderRadius: 18
+                    borderRadius: 18,
+                    marginTop: 20
                 }}>
                 <Text style={{
                     padding: 8,
@@ -240,7 +243,7 @@ function Register(props) {
                 <Text style={{
                     padding: 8,
                     fontSize: fontSizes.h6,
-                    color: colors.primary,
+                    color: 'white',
                     alignSelf: 'center',
                 }}>Login</Text>
             </TouchableOpacity>
@@ -259,7 +262,7 @@ function Register(props) {
                 <Text style={{
                     padding: 8,
                     fontSize: fontSizes.h6,
-                    color: 'white',
+                    color: '#E17A8D',
                     alignSelf: 'center',
                     marginHorizontal: 5,
                 }}>Use other methods ?</Text>

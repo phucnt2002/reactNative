@@ -9,7 +9,7 @@ yarn add react-native-gesture-handler
 yarn add react-native-reanimated
  */
 import * as React from "react";
-import { Settings, Main, Chart } from "../screens";
+import { Settings, Main, Chart, Profile } from "../screens";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { fontSizes, colors } from "../constants";
 import Icon from "react-native-vector-icons/FontAwesome5";
@@ -21,8 +21,8 @@ const screenOptions = ({ route }) => ({
   headerShown: false,
   tabBarActiveTintColor: "white",
   tabBarInactiveTintColor: colors.inactive,
-  tabBarActiveBackgroundColor: colors.primary,
-  tabBarInactiveBackgroundColor: colors.primary,
+  tabBarActiveBackgroundColor: '#5567C9',
+  tabBarInactiveBackgroundColor: '#5567C9',
   tabBarBackground: () => (
     <View style={{ backgroundColor: colors.primary, flex: 1 }}></View>
   ),
@@ -40,9 +40,11 @@ const screenOptions = ({ route }) => ({
             : route.name == "Settings"
             ? "cogs"
             : route.name == "Main"
-            ? "heart"
+            ? "home"
             : route.name == "Chart"
             ? "chart-line"
+            : route.name == "Profile"
+            ? "user"
             : ""
         }
         size={23}
@@ -79,6 +81,16 @@ function UITab(props) {
         component={Settings}
         options={{
           tabBarLabel: "Settings",
+          tabBarLabelStyle: {
+            fontSize: fontSizes.h6,
+          },
+        }}
+      />
+      <Tab.Screen
+        name={"Profile"}
+        component={Profile}
+        options={{
+          tabBarLabel: "Profile",
           tabBarLabelStyle: {
             fontSize: fontSizes.h6,
           },

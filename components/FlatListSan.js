@@ -77,7 +77,8 @@ function FlatListItem(props) {
           flex: 1,
           flexDirection: "row",
           alignItems: "center",
-          backgroundColor: index % 2 == 0 ? colors.primary : colors.inactive,
+          //backgroundColor: index % 2 == 0 ? colors.primary : colors.inactive,
+          backgroundColor: '#8D9AC5',
           borderRadius: 10,
         }}
       >
@@ -203,8 +204,8 @@ function FlatListSan(props) {
   return (
     <View>
       <UIHeader
-        title={"Chon san"}
-        leftIconName={"arrow-left"}
+        title={"Danh sách sân bóng"}
+        //leftIconName={"arrow-left"}
         rightIconName={"plus"}
         onPressRightIcon={() => {
           setModalVisible(true);

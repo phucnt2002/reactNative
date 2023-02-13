@@ -355,5 +355,8 @@ const styles = StyleSheet.create({
     width: "100%",
     borderRadius: 10,
   },
+  shadowOpacity: 0.25,
+  shadowRadius: 4,
+  elevation: 5,
 });
 export default Booking;
