@@ -29,11 +29,10 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { FlatListSan } from "../components";
 import { Calendar, CalendarList, Agenda } from "react-native-calendars";
 import Timeline from "react-native-timeline-flatlist";
-import { BookingCalendar } from "react-native-booking-calendar";
-import { DateTime } from "luxon";
 import Modal from "react-native-modal";
 import { LocaleConfig } from "react-native-calendars";
 import san from "../data/san";
+import CalendarPicker from 'react-native-calendar-picker';
 import {
   onAuthStateChanged,
   firebaseDatabaseRef,
@@ -43,6 +42,7 @@ import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
   onValue,
+  update
 } from "../firebase/firebase";
 LocaleConfig.locales["fr"] = {
   monthNames: [
@@ -90,34 +90,35 @@ function Booking(props) {
   const { key, nameField, typeField, priceField, img, dataTime } =
     props.route.params.san;
   const  index  = props.route.params.index;
+  const minDate = new Date();
   const responseUser = auth.currentUser;
   const { navigate, goBack } = props.navigation;
   const [data, setData] = useState(dataTime);
   const [modalVisible, setModalVisible] = useState(false);
   const [nameCus, setNameCus] = useState("");
   const [phoneCus, setPhoneCus] = useState("");
-  const [daySelect, setDaySelect] = useState("")
+  const [daySelect, setDaySelect] = useState(minDate)
 
   const timeChecked = useRef();
   const dataFireBase = useRef();
-  const timeCalender = useRef();
-  const bookingTable = useRef();
+  // const timeCalender = useRef();
+  const bookingTableDS = useRef();
   console.log("rerender")
 
-  // useEffect(()=>{
-  //   onValue(
-  //     firebaseDatabaseRef(firebaseDatabase, "bookingTable"),
-  //     async (snapshot) => {
-  //       if (snapshot.exists()) {
-  //         snapshotObject = snapshot.val();
-  //         bookingTable.current = snapshotObject
-  //         debugger
-  //       }
-  //     }
-  //   );
-  // }, [])
+  useEffect(()=>{
+    console.log("useEffect1")
+    onValue(
+      firebaseDatabaseRef(firebaseDatabase, "bookingTable"),
+      async (snapshot) => {
+        if (snapshot.exists()) {
+          snapshotObject = snapshot.val();
+          bookingTableDS.current = snapshotObject
+        }
+      }
+    );
+  }, [])
   useEffect(() => {
-    console.log("useEffect")
+    console.log("useEffect2")
     onValue(
       firebaseDatabaseRef(firebaseDatabase, "field"),
       async (snapshot) => {
@@ -150,7 +151,9 @@ function Booking(props) {
         typeField: typeField,
         userID: auth.currentUser.uid,
         timeHourseBookinged: data.findIndex((item)=> item.isBooking==null),
-        timeCalenderSelect: timeCalender.current
+        daySelect: daySelect,
+        nameCus: nameCus,
+        phoneCus: phoneCus
       }
       data.map((item)=>{
         if(item.isBooking==null){
@@ -165,11 +168,21 @@ function Booking(props) {
         firebaseDatabaseRef(firebaseDatabase, `field`),
         dataFireBase.current
       );
+      try{
+        debugger
 
-      firebaseSet(
-        firebaseDatabaseRef(firebaseDatabase, `bookingTable/${timeCalender.current}`),
-        [bookingTable]
-      );
+        const listBooked = bookingTableDS.current[daySelect]
+        console.log([{listBooked}, bookingTable])
+        update(
+          firebaseDatabaseRef(firebaseDatabase, `bookingTable/${daySelect}`),
+          [...listBooked, bookingTable]
+        );
+      }catch{
+        firebaseSet(
+          firebaseDatabaseRef(firebaseDatabase, `bookingTable/${daySelect}`),
+          [bookingTable]
+        );
+      }
       setModalVisible(false);
     }
   };
@@ -184,7 +197,7 @@ function Booking(props) {
           goBack();
         }}
       ></UIHeader>
-      <CalendarList
+      {/* <Calendar
         onDayPress={day => {
           const newDay = {
             [day.dateString]: {selected: true, marked: true, selectedColor: 'blue'}
@@ -200,6 +213,13 @@ function Booking(props) {
         // Set custom calendarWidth.
         calendarWidth={Dimensions.get("window").width}
         calendarHeight={Dimensions.get("window").height * 0.4}
+      /> */}
+      <CalendarPicker
+        minDate={minDate}
+        onDateChange={(date)=>{
+          alert(date)
+          setDaySelect(Date.parse(date.toString()))
+        }}
       />
       {/* <ScrollView>
         <BookingCalendar
