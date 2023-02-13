@@ -28,6 +28,7 @@ import {
   onValue,
 } from "../firebase/firebase";
 import { async } from "@firebase/util";
+import dataTime from '../data/dataTime'
 // const LeftAction = () => {
 //   console.log("huhu")
 //   return (
@@ -98,6 +99,7 @@ function FlatListItem(props) {
 function FlatListSan(props) {
   props = props.props;
   const responseUser = auth.currentUser;
+  let snapshotObject
 
   const [data, setData] = useState([]);
 
@@ -130,18 +132,36 @@ function FlatListSan(props) {
   const saveOnPress = () => {
     setModalVisible(!modalVisible);
     if (responseUser) {
-      let user = {
-        userID: responseUser.uid,
-        san: [...data, {
-          nameField: nameField,
-          typeField: value,
-          priceField: priceField,
-        }],
-      };
-      firebaseSet(
-        firebaseDatabaseRef(firebaseDatabase, `field/${responseUser.uid}`),
-        user
-      );
+      debugger
+      try{
+        let user = {
+          userID: responseUser.uid,
+          san: [...data, {
+            nameField: nameField,
+            typeField: value,
+            priceField: priceField,
+            dataTime
+          }],
+        };
+        firebaseSet(
+          firebaseDatabaseRef(firebaseDatabase, `field/${responseUser.uid}`),
+          user
+        );
+      }catch{
+        let user = {
+          userID: responseUser.uid,
+          san: [{
+            nameField: nameField,
+            typeField: value,
+            priceField: priceField,
+            dataTime
+          }],
+        };
+        firebaseSet(
+          firebaseDatabaseRef(firebaseDatabase, `field/${responseUser.uid}`),
+          user
+        );
+      }
     }
 
     // onAuthStateChanged(auth, (responseUser) => {
@@ -162,7 +182,6 @@ function FlatListSan(props) {
     //   }
     // });
   };
-
   const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
@@ -170,11 +189,10 @@ function FlatListSan(props) {
       firebaseDatabaseRef(firebaseDatabase, "field"),
       async (snapshot) => {
         if (snapshot.exists()) {
-          let snapshotObject = snapshot.val();
+          snapshotObject = snapshot.val();
           const currentUser = responseUser.uid;
           const dataCurrent = snapshotObject[currentUser]
           setData(dataCurrent.san)
-          console.log("set data")
         }
       }
     );
@@ -207,7 +225,7 @@ function FlatListSan(props) {
               index={index}
               deleteItem={deleteItem}
               onPress={() => {
-                navigate("Booking", { san: item });
+                navigate("Booking", { san: item, index: index });
               }}
             ></FlatListItem>
           );
