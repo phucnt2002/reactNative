@@ -96,20 +96,28 @@ function Login(props) {
                 source={
                     images.logo
                 } style={{
-                    width: 120,
+                    width: 130,
                     height: 120,
                     alignSelf: 'center'
                 }} />
         </View>
         <View style={{
-            flex: 30
+            flex: 20,
+            backgroundColor: '#E17A8D',
+            padding: 10,
+            marginLeft: 10,
+            marginRight: 10,
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20,
+
         }}>
             <View style={{
                 marginHorizontal: 15
             }}>
                 <Text style={{
-                    fontSize: fontSizes.h6,
-                    color: colors.primary
+                    fontSize: 18,
+                    color: '#001949',
+                    marginTop: 15
                 }}>Email:</Text>
                 <TextInput
                     onChangeText={(text)=>{
@@ -125,7 +133,9 @@ function Login(props) {
                        setEmail(text)    
                     }}
                     style={{
-                        color: 'black'
+                        color: 'black',
+                        marginTop: 5
+
                     }}
                     keyboardType='email'
                     placeholder='example@gmail.com'
@@ -133,7 +143,7 @@ function Login(props) {
                     placeholderTextColor={colors.placeholder}
                 />
                 <View style={{height: 1, 
-                    backgroundColor: colors.primary, 
+                    backgroundColor: '#001949', 
                     width: '100%',                    
                     marginHorizontal: 15,
                     marginBottom: 5,
@@ -149,8 +159,8 @@ function Login(props) {
                 marginHorizontal: 15
             }}>
                 <Text style={{
-                    fontSize: fontSizes.h6,
-                    color: colors.primary
+                    fontSize: 18,
+                    color: '#001949'
                 }}>Password:</Text>
                 <TextInput
                     onChangeText={(text)=>{
@@ -159,7 +169,9 @@ function Login(props) {
                         setPassword(text)    
                     }}                    
                     style={{
-                        color: 'black'
+                        color: 'black',
+                        marginTop: 5
+
                     }}
                     secureTextEntry={true}
                     placeholder='Enter your password'
@@ -167,7 +179,7 @@ function Login(props) {
                     placeholderTextColor={colors.placeholder}
                 />
                 <View style={{height: 1, 
-                    backgroundColor: colors.primary, 
+                    backgroundColor: '#001949', 
                     width: '100%',
                     marginBottom: 15,
                     marginHorizontal: 15,
@@ -181,7 +193,14 @@ function Login(props) {
             </View>
         </View>
         {keyboardIsShown == false ? <View style={{
-            flex: 15
+            flex: 10,
+            backgroundColor: '#E17A8D',
+            padding: 10,
+            marginLeft: 10,
+            marginRight: 10,
+            borderBottomLeftRadius: 20,
+            borderBottomRightRadius: 20,
+
         }}>
             <TouchableOpacity
                 disabled = {isValidationOK() == false}
@@ -197,7 +216,7 @@ function Login(props) {
                 }}
                 style={{
                     backgroundColor: isValidationOK() == true 
-                                        ? colors.primary: colors.inactive,
+                                        ? '#001949': colors.inactive,
                     justifyContent: 'center',
                     alignItems: 'center',
                     width: '50%',
@@ -218,10 +237,11 @@ function Login(props) {
                 <Text style={{
                     padding: 8,
                     fontSize: fontSizes.h6,
-                    color: colors.primary,
+                    color: '#001949',
                     alignSelf: 'center',
                 }}>New user? Register now</Text>
             </TouchableOpacity>
+
         </View> : <View style={{
             flex: 15
         }}></View>}
@@ -234,19 +254,23 @@ function Login(props) {
                 alignItems: 'center',
                 marginHorizontal: 20
             }}>
-                <View style={{height: 1, backgroundColor: 'black', flex: 1}} />
+                <View style={{height: 1, backgroundColor: 'black', flex: 1, 
+                    marginTop:15}} />
                 <Text style={{
                     padding: 8,
                     fontSize: fontSizes.h6,
-                    color: 'black',
+                    color: '#E17A8D',
                     alignSelf: 'center',
                     marginHorizontal: 5,
+                    marginTop:15
                 }}>Use other methods ?</Text>
-                <View style={{height: 1, backgroundColor: 'black', flex: 1}} />
+                <View style={{height: 1, backgroundColor: 'black', flex: 1, 
+                    marginTop:15}} />
             </View>
             <View style={{
                 flexDirection: 'row',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                marginTop:15
             }}>
                 <Icon name='facebook' size={35} color={colors.facebook} />
                 <View style={{width: 15}}/>

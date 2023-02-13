@@ -51,7 +51,7 @@ function Booking(props) {
     console.log(fDate + "(" + fDate + ")");
   };
   const showModeDate = (currentMode) => {
-    //setShow(true);
+    setShow(true);
     setModeDate(currentMode);
   };
 
