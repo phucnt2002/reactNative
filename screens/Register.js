@@ -85,10 +85,10 @@ function Register(props) {
             margin: 10,
             borderRadius: 20,
             shadowColor: '#000',
-          shadowOffset: { width: 1, height: 1 },
-          shadowOpacity:  0.4,
-          shadowRadius: 3,
-          elevation: 5,
+            shadowOffset: { width: 1, height: 1 },
+            shadowOpacity:  0.4,
+            shadowRadius: 3,
+            elevation: 5,
         }}>
             <View style={{
                 marginHorizontal: 15
