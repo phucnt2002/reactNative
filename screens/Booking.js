@@ -86,7 +86,7 @@ LocaleConfig.locales["fr"] = {
   today: "Today",
 };
 LocaleConfig.defaultLocale = "fr";
-function Booking(props) {
+ function Booking(props) {
   const { key, nameField, typeField, priceField, img, dataTime } =
     props.route.params.san;
   const  index  = props.route.params.index;
@@ -103,10 +103,8 @@ function Booking(props) {
   const dataFireBase = useRef();
   // const timeCalender = useRef();
   const bookingTableDS = useRef();
-  console.log("rerender")
 
   useEffect(()=>{
-    console.log("useEffect1")
     onValue(
       firebaseDatabaseRef(firebaseDatabase, "bookingTable"),
       async (snapshot) => {
@@ -169,15 +167,16 @@ function Booking(props) {
         dataFireBase.current
       );
       try{
-        debugger
-
         const listBooked = bookingTableDS.current[daySelect]
-        console.log([{listBooked}, bookingTable])
-        update(
+        console.log([...listBooked, bookingTable])
+        const up = [...listBooked, bookingTable]
+        debugger
+        firebaseSet(
           firebaseDatabaseRef(firebaseDatabase, `bookingTable/${daySelect}`),
-          [...listBooked, bookingTable]
+          up
         );
       }catch{
+        console.log("catch")
         firebaseSet(
           firebaseDatabaseRef(firebaseDatabase, `bookingTable/${daySelect}`),
           [bookingTable]
