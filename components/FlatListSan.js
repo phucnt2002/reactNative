@@ -105,10 +105,10 @@ function FlatListSan(props) {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(null);
   const [items, setItems] = useState([
-    { label: "San 5", value: "san5" },
-    { label: "San 7", value: "san7" },
-    { label: "San 9", value: "san9" },
-    { label: "San 11", value: "san11" },
+    { label: "Sân 5", value: "Sân 5" },
+    { label: "Sân 7", value: "Sân 7" },
+    { label: "Sân 9", value: "Sân 9" },
+    { label: "Sân 11", value: "Sân 11" },
   ]);
   const [nameField, setNameField] = useState("");
   const [priceField, setPriceField] = useState("");
