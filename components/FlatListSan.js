@@ -77,14 +77,8 @@ function FlatListItem(props) {
           flex: 1,
           flexDirection: "row",
           alignItems: "center",
-          //backgroundColor: index % 2 == 0 ? colors.primary : colors.inactive,
-          backgroundColor: '#8D9AC5',
+          backgroundColor: index % 2 == 0 ? colors.primary : colors.inactive,
           borderRadius: 10,
-          shadowColor: '#000',
-          shadowOffset: { width: 1, height: 1 },
-          shadowOpacity:  0.4,
-          shadowRadius: 3,
-          elevation: 5,
         }}
       >
         <Image
@@ -92,9 +86,9 @@ function FlatListItem(props) {
           style={{ width: 100, height: 100, margin: 5 }}
         />
         <View>
-          <Text>{`Tên sân: ${item.nameField}`}</Text>
-          <Text>{`Loại sân: ${item.typeField}`}</Text>
-          <Text>{`Giá: ${item.priceField}`}</Text>
+          <Text>{`Ten san: ${item.nameField}`}</Text>
+          <Text>{`Loai san: ${item.typeField}`}</Text>
+          <Text>{`Gia: ${item.priceField}`}</Text>
         </View>
       </TouchableOpacity>
     </Swipeable>
@@ -210,8 +204,8 @@ function FlatListSan(props) {
   return (
     <View>
       <UIHeader
-        title={"Danh sách sân bóng"}
-        //leftIconName={"arrow-left"}
+        title={"Chon san"}
+        leftIconName={"arrow-left"}
         rightIconName={"plus"}
         onPressRightIcon={() => {
           setModalVisible(true);
@@ -227,7 +221,6 @@ function FlatListSan(props) {
         renderItem={({ item, index }) => {
           return (
             <FlatListItem
-              
               item={item}
               index={index}
               deleteItem={deleteItem}
@@ -253,7 +246,7 @@ function FlatListSan(props) {
                 setNameField(text);
               }}
               style={styles.input}
-              placeholder="Tên sân"
+              placeholder="Ten san"
               placeholderTextColor={colors.placeholder}
             />
             <DropDownPicker
@@ -263,16 +256,14 @@ function FlatListSan(props) {
               setOpen={setOpen}
               setValue={setValue}
               setItems={setItems}
-              placeholder="Chọn loại sân"
             />
             <TextInput
               onChangeText={(text) => {
                 setPriceField(text);
               }}
               style={styles.input}
-              placeholder="Giá"
+              placeholder="Gia"
               placeholderTextColor={colors.placeholder}
-              keyboardType="numeric"
             />
             <View style={{ flexDirection: "row" }}>
               <Pressable

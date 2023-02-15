@@ -5,6 +5,7 @@ import Main from "./Main"
 import Chart from "./Chart"
 import Booking from "./Booking"
 import Profile from "./Profile"
+import Booked from "./Booked"
 export {
     Login,
     Settings,
@@ -12,5 +13,6 @@ export {
     Main,
     Chart,
     Booking,
-    Profile
+    Profile,
+    Booked
 }
