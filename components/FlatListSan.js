@@ -111,7 +111,6 @@ function FlatListSan(props) {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(null);
   const [items, setItems] = useState([
-    { label: "Sân 2", value: "Sân 2" },
     { label: "Sân 5", value: "Sân 5" },
     { label: "Sân 7", value: "Sân 7" },
     { label: "Sân 9", value: "Sân 9" },
