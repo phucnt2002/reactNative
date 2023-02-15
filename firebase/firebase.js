@@ -15,6 +15,8 @@ import {
     child,
     get,
     onValue,
+    update,
+
 } from "firebase/database"
 const firebaseConfig = {
     apiKey: "AIzaSyBMIZflVVCTAQaWDtq8Pf3fof7v2ArRce0",
@@ -42,4 +44,5 @@ export {
     get,
     onValue, //reload when online DB changed
     signInWithEmailAndPassword,
+    update
 }
