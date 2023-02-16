@@ -131,7 +131,6 @@ function Chart(props) {
       firebaseDatabaseRef(firebaseDatabase, "bookingTable"),
       async (snapshot) => {
         if (snapshot.exists()) {
-          debugger
           snapshotObject = snapshot.val();
           bookingTableDS.current = snapshotObject[auth.currentUser.uid];
           setData(bookingTableDS.current);
