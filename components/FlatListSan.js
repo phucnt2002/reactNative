@@ -46,8 +46,8 @@ function FlatListItem(props) {
   const { item, index, deleteItem, onPress } = props;
   const handlerLongClick = () => {
     Alert.alert(
-      "Xoa san",
-      `Ban chac chan muon xoa san ${item.nameField}?`,
+      "Xóa sân",
+      `Bạn có chắc chắn xóa sân ${item.nameField}?`,
       [
         {
           text: "No",
@@ -77,8 +77,16 @@ function FlatListItem(props) {
           flex: 1,
           flexDirection: "row",
           alignItems: "center",
-          backgroundColor: index % 2 == 0 ? colors.primary : colors.inactive,
+          backgroundColor:'#8d9ac5',
           borderRadius: 10,
+          shadowColor: "#000",
+          shadowOffset: {
+            width: 0,
+            height: 2,
+          },
+          shadowOpacity: 0.25,
+          shadowRadius: 4,
+          elevation: 5,
         }}
       >
         <Image
@@ -86,9 +94,9 @@ function FlatListItem(props) {
           style={{ width: 100, height: 100, margin: 5 }}
         />
         <View>
-          <Text>{`Ten san: ${item.nameField}`}</Text>
-          <Text>{`Loai san: ${item.typeField}`}</Text>
-          <Text>{`Gia: ${item.priceField}`}</Text>
+          <Text>{`Tên sân: ${item.nameField}`}</Text>
+          <Text>{`Loại sân: ${item.typeField}`}</Text>
+          <Text>{`Giá: ${item.priceField}`}</Text>
         </View>
       </TouchableOpacity>
     </Swipeable>
@@ -204,8 +212,8 @@ function FlatListSan(props) {
   return (
     <View>
       <UIHeader
-        title={"Chon san"}
-        leftIconName={"arrow-left"}
+        title={"Chọn sân"}
+        //leftIconName={"arrow-left"}
         rightIconName={"plus"}
         onPressRightIcon={() => {
           setModalVisible(true);
@@ -246,7 +254,7 @@ function FlatListSan(props) {
                 setNameField(text);
               }}
               style={styles.input}
-              placeholder="Ten san"
+              placeholder="Tên sân"
               placeholderTextColor={colors.placeholder}
             />
             <DropDownPicker
@@ -262,8 +270,9 @@ function FlatListSan(props) {
                 setPriceField(text);
               }}
               style={styles.input}
-              placeholder="Gia"
+              placeholder="Giá"
               placeholderTextColor={colors.placeholder}
+              keyboardType="numeric"
             />
             <View style={{ flexDirection: "row" }}>
               <Pressable

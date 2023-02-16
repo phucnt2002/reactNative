@@ -264,7 +264,7 @@ function Register(props) {
                 alignItems: 'center',
                 marginHorizontal: 20
             }}>
-                <View style={{height: 1, backgroundColor: 'white', flex: 1}} />
+                <View style={{height: 1, backgroundColor: 'black', flex: 1}} />
                 <Text style={{
                     padding: 8,
                     fontSize: fontSizes.h6,
@@ -272,7 +272,7 @@ function Register(props) {
                     alignSelf: 'center',
                     marginHorizontal: 5,
                 }}>Use other methods ?</Text>
-                <View style={{height: 1, backgroundColor: 'white', flex: 1}} />
+                <View style={{height: 1, backgroundColor: 'black', flex: 1}} />
             </View>
             <View style={{
                 flexDirection: 'row',

@@ -258,20 +258,18 @@ function Login(props) {
                 height: 40,
                 flexDirection: 'row',   
                 alignItems: 'center',
-                marginHorizontal: 20
+                marginHorizontal: 20,
+                marginTop: 10
             }}>
-                <View style={{height: 1, backgroundColor: 'black', flex: 1, 
-                    marginTop:15}} />
+                <View style={{height: 1, backgroundColor: 'black', flex: 1}} />
                 <Text style={{
                     padding: 8,
                     fontSize: fontSizes.h6,
                     color: '#E17A8D',
                     alignSelf: 'center',
-                    marginHorizontal: 5,
-                    marginTop:15
+                    marginHorizontal: 5
                 }}>Use other methods ?</Text>
-                <View style={{height: 1, backgroundColor: 'black', flex: 1, 
-                    marginTop:15}} />
+                <View style={{height: 1, backgroundColor: 'black', flex: 1}} />
             </View>
             <View style={{
                 flexDirection: 'row',
