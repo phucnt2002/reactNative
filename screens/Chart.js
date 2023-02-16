@@ -131,7 +131,6 @@ function Chart(props) {
       firebaseDatabaseRef(firebaseDatabase, "bookingTable"),
       async (snapshot) => {
         if (snapshot.exists()) {
-          debugger
           snapshotObject = snapshot.val();
           bookingTableDS.current = snapshotObject[auth.currentUser.uid];
           setData(bookingTableDS.current);
@@ -188,10 +187,10 @@ function Chart(props) {
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: '#3adebf'
+        backgroundColor: '#ededed'
       }}
     >
-      <Text style={{fontSize: fontSizes.h3, fontWeight: '700', color: 'white', marginBottom: 20}}>Biểu đồ thu nhập</Text>
+      <Text style={{fontSize: fontSizes.h3, fontWeight: '700', color: 'black', marginBottom: 20}}>Biểu đồ thu nhập</Text>
       <LineChart
         data={dataChart}
         width={Dimensions.get("window").width * 0.9} // from react-native
@@ -207,18 +206,19 @@ function Chart(props) {
           color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
           labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
           style: {
-            borderRadius: 16,
+            borderRadius: 10,
+            
           },
           propsForDots: {
             r: "6",
             strokeWidth: "2",
-            stroke: "#ffa726",
+            stroke: "white",
           },
         }}
         bezier
         style={{
           marginVertical: 8,
-          borderRadius: 16,
+          borderRadius: 10,
         }}
       />
       <BarChart
@@ -244,7 +244,7 @@ function Chart(props) {
         }}
         style={{
           marginVertical: 8,
-          borderRadius: 16,
+          borderRadius: 10,
         }}
         verticalLabelRotation={30}
       />
