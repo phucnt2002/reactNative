@@ -209,6 +209,7 @@ function FlatListSan(props) {
 
   const { navigation, route } = props;
   const { navigate, goBack } = navigation;
+  console.log("render")
   return (
     <View>
       <UIHeader

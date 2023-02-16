@@ -39,34 +39,114 @@ import {
   onValue,
   update,
 } from "../firebase/firebase";
+const chartConfigs = [
+  {
+    backgroundColor: "#000000",
+    backgroundGradientFrom: "#1E2923",
+    backgroundGradientTo: "#08130D",
+    color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
+    style: {
+      borderRadius: 16,
+    },
+  },
+  {
+    backgroundColor: "#022173",
+    backgroundGradientFrom: "#022173",
+    backgroundGradientTo: "#1b3fa0",
+    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+    style: {
+      borderRadius: 16,
+    },
+    propsForBackgroundLines: {
+      strokeDasharray: "", // solid background lines with no dashes
+    },
+  },
+  {
+    backgroundColor: "#ffffff",
+    backgroundGradientFrom: "#ffffff",
+    backgroundGradientTo: "#ffffff",
+    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+  },
+  {
+    backgroundColor: "#ffffff",
+    backgroundGradientFrom: "#ffffff",
+    backgroundGradientTo: "#ffffff",
+    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+  },
+  {
+    backgroundColor: "#26872a",
+    backgroundGradientFrom: "#43a047",
+    backgroundGradientTo: "#66bb6a",
+    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+    style: {
+      borderRadius: 16,
+    },
+  },
+  {
+    backgroundColor: "#000000",
+    backgroundGradientFrom: "#000000",
+    backgroundGradientTo: "#000000",
+    color: (opacity = 1) => `rgba(${255}, ${255}, ${255}, ${opacity})`,
+  },
+  {
+    backgroundColor: "#0091EA",
+    backgroundGradientFrom: "#0091EA",
+    backgroundGradientTo: "#0091EA",
+    color: (opacity = 1) => `rgba(${255}, ${255}, ${255}, ${opacity})`,
+  },
+  {
+    backgroundColor: "#e26a00",
+    backgroundGradientFrom: "#fb8c00",
+    backgroundGradientTo: "#ffa726",
+    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+    style: {
+      borderRadius: 16,
+    },
+  },
+  {
+    backgroundColor: "#b90602",
+    backgroundGradientFrom: "#e53935",
+    backgroundGradientTo: "#ef5350",
+    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+    style: {
+      borderRadius: 16,
+    },
+  },
+  {
+    backgroundColor: "#ff3e03",
+    backgroundGradientFrom: "#ff3e03",
+    backgroundGradientTo: "#ff3e03",
+    color: (opacity = 1) => `rgba(${0}, ${0}, ${0}, ${opacity})`,
+  },
+];
 function Chart(props) {
+  // const userID = auth.currentUser.uid;
   const bookingTableDS = useRef();
   const [labels, setLabels] = useState();
   const [data, setData] = useState();
-  const datasets = useRef([
-    Math.random() * 100,
-    Math.random() * 100,
-    Math.random() * 100,
-    Math.random() * 100,
-    Math.random() * 100,
-    Math.random() * 100,
-  ]);
-  const [labelChart, setLabelChart] = useState()
+  const datasets = useRef();
+  const [labelChart, setLabelChart] = useState();
   useEffect(() => {
     onValue(
       firebaseDatabaseRef(firebaseDatabase, "bookingTable"),
       async (snapshot) => {
         if (snapshot.exists()) {
+          debugger
           snapshotObject = snapshot.val();
-          bookingTableDS.current = snapshotObject;
+          bookingTableDS.current = snapshotObject[auth.currentUser.uid];
           setData(bookingTableDS.current);
           var listTime = [];
-          Object.keys(bookingTableDS.current).map((item) => {
+          var arr = Object.keys(bookingTableDS.current);
+          arr.sort((a, b)=>{
+            parseFloat(a) - parseFloat(b)
+          })
+          arr.map((item) => {
             var a = new Date(parseInt(item));
-            listTime.push(a.toLocaleDateString("en-US"));
+            // listTime.push(a.toLocaleDateString("en-US"));
+            listTime.push(a.getDate()+"/"+(a.getMonth()+1));
           });
-          setLabels(Object.keys(bookingTableDS.current))
-          setLabelChart(listTime)
+          setLabels(arr);
+          setLabelChart(listTime);
         }
       }
     );
@@ -89,19 +169,32 @@ function Chart(props) {
     // console.log(listDataDay)
   }
 
-  return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", margin: 5}}>
-      <Text>Bieu do thu nhap</Text>
+  const dataChart = {
+    labels: labelChart,
+    datasets: [
+      {
+        data: datasets.current,
+      },
+    ],
+  };
+  console.log(datasets.current);
+  const graphStyle = {
+    marginVertical: 8,
+    ...chartConfig.style,
+  };
+  return datasets.current != undefined ? (
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: '#3adebf'
+      }}
+    >
+      <Text style={{fontSize: fontSizes.h3, fontWeight: '700', color: 'white', marginBottom: 20}}>Biểu đồ thu nhập</Text>
       <LineChart
-        data={{
-          labels: labelChart,
-          datasets: [
-            {
-              data: datasets.current,
-            },
-          ],
-        }}
-        width={Dimensions.get("window").width*0.9} // from react-native
+        data={dataChart}
+        width={Dimensions.get("window").width * 0.9} // from react-native
         height={220}
         // yAxisLabel="$"
         yAxisSuffix="k"
@@ -110,7 +203,7 @@ function Chart(props) {
           backgroundColor: "#e26a00",
           backgroundGradientFrom: "#fb8c00",
           backgroundGradientTo: "#ffa726",
-          decimalPlaces: 2, // optional, defaults to 2dp
+          decimalPlaces: 0, // optional, defaults to 2dp
           color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
           labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
           style: {
@@ -128,11 +221,50 @@ function Chart(props) {
           borderRadius: 16,
         }}
       />
+      <BarChart
+        data={dataChart}
+        width={Dimensions.get("window").width * 0.9}
+        height={300}
+        yAxisSuffix="k"
+        chartConfig={{
+          backgroundColor: "#e26a00",
+          backgroundGradientFrom: "#42bfff",
+          backgroundGradientTo: "#ffa726",
+          decimalPlaces: 0, // optional, defaults to 2dp
+          color: (opacity = 0) => `rgba(255, 255, 255, ${opacity})`,
+          labelColor: (opacity = 0) => `rgba(255, 255, 255, ${opacity})`,
+          style: {
+            borderRadius: 16,
+          },
+          propsForDots: {
+            r: "6",
+            strokeWidth: "2",
+            stroke: "#f880ff",
+          },
+        }}
+        style={{
+          marginVertical: 8,
+          borderRadius: 16,
+        }}
+        verticalLabelRotation={30}
+      />
+    </View>
+  ) : (
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        margin: 5,
+      }}
+    >
+      <Text>Chua co du lieu</Text>
     </View>
   );
 }
 const chartConfig = {
-  backgroundGradientFrom: "#1E2923",
+  backgroundColor: "#e26a00",
+
   backgroundGradientFromOpacity: 0,
   backgroundGradientTo: "#08130D",
   backgroundGradientToOpacity: 0.5,

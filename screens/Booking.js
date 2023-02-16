@@ -167,18 +167,17 @@ LocaleConfig.defaultLocale = "fr";
         dataFireBase.current
       );
       try{
-        const listBooked = bookingTableDS.current[daySelect]
+        const listBooked = bookingTableDS.current[auth.currentUser.uid][daySelect]
         console.log([...listBooked, bookingTable])
         const up = [...listBooked, bookingTable]
-        debugger
         firebaseSet(
-          firebaseDatabaseRef(firebaseDatabase, `bookingTable/${daySelect}`),
+          firebaseDatabaseRef(firebaseDatabase, `bookingTable/${auth.currentUser.uid}/${daySelect}`),
           up
         );
       }catch{
         console.log("catch")
         firebaseSet(
-          firebaseDatabaseRef(firebaseDatabase, `bookingTable/${daySelect}`),
+          firebaseDatabaseRef(firebaseDatabase, `bookingTable/${auth.currentUser.uid}/${daySelect}`),
           [bookingTable]
         );
       }
@@ -216,7 +215,7 @@ LocaleConfig.defaultLocale = "fr";
       <CalendarPicker
         minDate={minDate}
         onDateChange={(date)=>{
-          alert(date)
+          // alert(date)
           setDaySelect(Date.parse(date.toString()))
         }}
       />
