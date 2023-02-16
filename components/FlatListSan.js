@@ -223,7 +223,7 @@ function FlatListSan(props) {
       </View>
       <FlatList
         data={data}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.key}
         renderItem={({ item, index }) => {
           return (
             <FlatListItem

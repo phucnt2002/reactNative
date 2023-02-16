@@ -9,7 +9,7 @@ yarn add react-native-gesture-handler
 yarn add react-native-reanimated
  */
 import * as React from "react";
-import { Settings, Main, Chart, Profile } from "../screens";
+import { Settings, Main, Chart, Profile, Booked } from "../screens";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { fontSizes, colors } from "../constants";
 import Icon from "react-native-vector-icons/FontAwesome5";
@@ -20,7 +20,6 @@ const Tab = createBottomTabNavigator();
 const screenOptions = ({ route }) => ({
   headerShown: false,
   tabBarActiveTintColor: "#5567c9",
-  tabBarInactiveTintColor: colors.inactive,
   tabBarActiveBackgroundColor: 'white',
   tabBarInactiveBackgroundColor: 'white',
   tabBarBackground: () => (
@@ -33,8 +32,8 @@ const screenOptions = ({ route }) => ({
           paddingTop: 5,
         }}
         name={
-          route.name == "ProductGridView"
-            ? "align-center"
+          route.name == "Booked"
+            ? "calendar-check"
             : route.name == "FoodList"
             ? "accusoft"
             : route.name == "Settings"
@@ -62,6 +61,16 @@ function UITab(props) {
         component={Main}
         options={{
           tabBarLabel: "Main",
+          tabBarLabelStyle: {
+            fontSize: fontSizes.h6,
+          },
+        }}
+      />
+      <Tab.Screen
+        name={"Booked"}
+        component={Booked}
+        options={{
+          tabBarLabel: "Booked",
           tabBarLabelStyle: {
             fontSize: fontSizes.h6,
           },
