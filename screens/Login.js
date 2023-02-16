@@ -252,7 +252,7 @@ function Login(props) {
             flex: 15
         }}></View>}
         {keyboardIsShown == false ? <View style={{
-            flex: 25,            
+            flex: 30,            
         }}>
             <View style={{
                 height: 40,

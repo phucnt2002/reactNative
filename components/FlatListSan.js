@@ -77,16 +77,13 @@ function FlatListItem(props) {
           flex: 1,
           flexDirection: "row",
           alignItems: "center",
-          backgroundColor:'#8d9ac5',
+          backgroundColor:'white',
           borderRadius: 10,
-          shadowColor: "#000",
-          shadowOffset: {
-            width: 0,
-            height: 2,
-          },
-          shadowOpacity: 0.25,
-          shadowRadius: 4,
-          elevation: 5,
+          shadowColor: '#00000',
+          shadowOffset:{width: 0, height:5},
+          shadowOpacity: 0.15,
+          position: 'relative',
+          shadowRadius: 5
         }}
       >
         <Image
@@ -94,9 +91,9 @@ function FlatListItem(props) {
           style={{ width: 100, height: 100, margin: 5 }}
         />
         <View>
-          <Text>{`Tên sân: ${item.nameField}`}</Text>
-          <Text>{`Loại sân: ${item.typeField}`}</Text>
-          <Text>{`Giá: ${item.priceField}`}</Text>
+          <Text style={{color: '#5567c9', textTransform: 'uppercase', fontWeight: 'bold', margin: 5}}>{`Tên sân: ${item.nameField}`}</Text>
+          <Text style={{marginLeft: 5}}>{`Loại sân: ${item.typeField}`}</Text>
+          <Text style={{marginLeft: 5}}>{`Giá: ${item.priceField}k`}</Text>
         </View>
       </TouchableOpacity>
     </Swipeable>
@@ -213,7 +210,7 @@ function FlatListSan(props) {
   return (
     <View>
       <UIHeader
-        title={"Chọn sân"}
+        title={"Danh sách sân bóng"}
         //leftIconName={"arrow-left"}
         rightIconName={"plus"}
         onPressRightIcon={() => {
