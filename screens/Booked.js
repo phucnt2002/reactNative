@@ -84,12 +84,17 @@ function Booked(props) {
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
       <Animated.FlatList
         data={data}
-        onScroll={()=>{
-          Animated.event(
-            [{ nativeEvent: { contentoffset: { y: scrollY } } }],
-            { useNativeDriver: true }
-          )
-        }}
+        onScroll={Animated.event([
+          {
+            nativeEvent: {
+              contentOffset: {
+                y: scrollY
+              }
+            }
+          }
+        ], 
+         { useNativeDriver: true } // Add this line
+        )}
         keyExtractor={(item) => {
           item.key;
         }}
@@ -98,18 +103,22 @@ function Booked(props) {
           paddingTop: StatusBar.currentHeight || 42,
         }}
         renderItem={({ item, index }) => {
-          const inputRange = [
-            -1,
-            0,
-            ITEM_SIZE *index,
-            ITEM_SIZE *(index+2),
-          ]
-
           const scale = scrollY.interpolate({
-            inputRange,
-            outputRange: [1, 1, 1, 0]
-          })
-
+                      inputRange: [
+                        -1, 0,
+                        ITEM_SIZE * index,
+                        ITEM_SIZE * (index + 2)
+                      ],
+                      outputRange: [1, 1, 1, 0]
+                    })
+                    const opacity = scrollY.interpolate({
+                      inputRange: [
+                        -1, 0,
+                        ITEM_SIZE * index,
+                        ITEM_SIZE * (index + 0.5)
+                      ],
+                      outputRange: [1, 1, 1, 0]
+                    })
           return (
             <Animated.View
               style={{
@@ -123,7 +132,8 @@ function Booked(props) {
                 shadowOpacity: 0.3,
                 shadowRadius: 20,
                 elevation: 5,
-                // transform: [{scale}]
+                transform: [{scale}],
+                opacity: opacity
               }}
               // style={{
               //   marginHorizontal: 10,
@@ -171,6 +181,7 @@ function Booked(props) {
             </Animated.View>
           );
         }}
+        showsHorizontalScrollIndicator={false}
       />
     </View>
   );
