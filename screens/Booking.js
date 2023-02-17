@@ -292,7 +292,7 @@ LocaleConfig.defaultLocale = "fr";
           onPress={onPressBooking}
         >
           <Text style={{ fontSize: fontSizes.h3, color: "white" }}>
-            Booking
+            ĐẶT SÂN
           </Text>
         </TouchableOpacity>
       </View>

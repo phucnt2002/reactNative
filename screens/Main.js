@@ -21,6 +21,9 @@ import {FlatListSan} from '../components';
 
 
 function Main(props){
-    return <FlatListSan props={props}></FlatListSan>
-}
+    return (
+    <View style={{flex: 1, backgroundColor: '#ededed'}}>
+        <FlatListSan props={props}></FlatListSan>
+    </View>
+)}
 export default Main

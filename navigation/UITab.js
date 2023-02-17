@@ -19,10 +19,9 @@ const Tab = createBottomTabNavigator();
 
 const screenOptions = ({ route }) => ({
   headerShown: false,
-  tabBarActiveTintColor: "white",
-  tabBarInactiveTintColor: colors.inactive,
-  tabBarActiveBackgroundColor: "#5567C9",
-  tabBarInactiveBackgroundColor: "#5567C9",
+  tabBarActiveTintColor: "#5567c9",
+  tabBarActiveBackgroundColor: 'white',
+  tabBarInactiveBackgroundColor: 'white',
   tabBarBackground: () => (
     <View style={{ backgroundColor: colors.primary, flex: 1 }}></View>
   ),
@@ -48,13 +47,14 @@ const screenOptions = ({ route }) => ({
             : ""
         }
         size={23}
-        color={focused ? "white" : colors.inactive}
+        color={focused ? "#5567c9" : colors.inactive}
       />
     );
   },
 });
 function UITab(props) {
   return (
+    
     <Tab.Navigator screenOptions={screenOptions}>
       <Tab.Screen
         name={"Main"}
