@@ -1,34 +1,30 @@
 import {
-  FlatList,
   View,
   TouchableOpacity,
   Alert,
   Modal,
-  TouchableHighlight,
   TextInput,
   Pressable,
   StyleSheet,
+  Animated,
+  StatusBar,
+  Button
 } from "react-native";
 import { Text, Image } from "react-native";
 import { colors } from "../constants";
-import san from "../data/san";
-import Swipeable from "react-native-gesture-handler/Swipeable";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import UIHeader from "./UIHeader";
-import AddSan from "./AddSan";
 import DropDownPicker from "react-native-dropdown-picker";
 import {
-  onAuthStateChanged,
   firebaseDatabaseRef,
   firebaseSet,
   firebaseDatabase,
   auth,
-  createUserWithEmailAndPassword,
-  sendEmailVerification,
   onValue,
 } from "../firebase/firebase";
-import { async } from "@firebase/util";
 import dataTime from '../data/dataTime'
+import * as ImagePicker from 'expo-image-picker';
+
 // const LeftAction = () => {
 //   console.log("huhu")
 //   return (
@@ -42,71 +38,19 @@ import dataTime from '../data/dataTime'
 //   );
 // };
 
-function FlatListItem(props) {
-  const { item, index, deleteItem, onPress } = props;
-  const handlerLongClick = () => {
-    Alert.alert(
-      "Xóa sân",
-      `Bạn có chắc chắn xóa sân ${item.nameField}?`,
-      [
-        {
-          text: "No",
-          onPress: () => console.log("Cancel Pressed"),
-          style: "cancel",
-        },
-        {
-          text: "Yes",
-          onPress: () => {
-            deleteItem(index);
-          },
-        },
-      ],
-      { cancelable: true }
-    );
-  };
-
-
-  return (
-    <Swipeable>
-      <TouchableOpacity
-        onLongPress={handlerLongClick}
-        onPress={onPress}
-        style={{
-          marginHorizontal: 10,
-          marginVertical: 5,
-          flex: 1,
-          flexDirection: "row",
-          alignItems: "center",
-          backgroundColor:'white',
-          borderRadius: 10,
-          shadowColor: '#00000',
-          shadowOffset:{width: 0, height:5},
-          shadowOpacity: 0.15,
-          position: 'relative',
-          shadowRadius: 5
-        }}
-      >
-        <Image
-          source={{ uri: "https://vecgroup.vn/upload_images/images/2021/12/09/kich-thuoc-san-bong-11-nguoi(1).png" }}
-          style={{ width: 100, height: 100, margin: 5 }}
-        />
-        <View>
-          <Text style={{color: '#5567c9', textTransform: 'uppercase', fontWeight: 'bold', margin: 5}}>{`Tên sân: ${item.nameField}`}</Text>
-          <Text style={{marginLeft: 5}}>{`Loại sân: ${item.typeField}`}</Text>
-          <Text style={{marginLeft: 5}}>{`Giá: ${item.priceField}k`}</Text>
-        </View>
-      </TouchableOpacity>
-    </Swipeable>
-  );
-}
-
 function FlatListSan(props) {
+  const AVATAR_SIZE = 70;
+  const SPACING = 20;
+  const RADIUS = AVATAR_SIZE / 2;
+  const ITEM_SIZE = AVATAR_SIZE + SPACING *3
+  const scrollY = React.useRef(new Animated.Value(0)).current
+
   props = props.props;
   const responseUser = auth.currentUser;
   let snapshotObject
 
   const [data, setData] = useState([]);
-
+  const [image, setImage] = useState(null);
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(null);
   const [items, setItems] = useState([
@@ -204,9 +148,31 @@ function FlatListSan(props) {
 
   }, []);
 
-  const { navigation, route } = props;
-  const { navigate, goBack } = navigation;
-  console.log("render")
+    const { navigation, route } = props;
+    const { navigate, goBack } = navigation;
+    console.log("render")
+    
+    // function FlatListItem(props) {
+    //   const { item, index, deleteItem, onPress } = props;
+    //   const handlerLongClick = () => {
+        
+    //   };
+    // }
+    const pickImage = async () => {
+      // No permissions request is necessary for launching the image library
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+  
+      console.log(result);
+  
+      if (!result.canceled) {
+        setImage(result.assets[0].uri);
+      }
+    };
   return (
     <View>
       <UIHeader
@@ -221,22 +187,104 @@ function FlatListSan(props) {
       <View style={{flex:1}}>
         
       </View>
-      <FlatList
+      <Animated.FlatList
         data={data}
+        onScroll={Animated.event([
+          {
+            nativeEvent: {
+              contentOffset: {
+                y: scrollY
+              }
+            }
+          }
+        ], 
+         { useNativeDriver: true } // Add this line
+        )}
         keyExtractor={(item) => item.key}
+        contentContainerStyle={{
+          padding: SPACING,
+          paddingTop: StatusBar.currentHeight || 42,
+        }}
         renderItem={({ item, index }) => {
+          const scale = scrollY.interpolate({
+            inputRange: [
+              -1, 0,
+              ITEM_SIZE * index,
+              ITEM_SIZE * (index + 2)
+            ],
+            outputRange: [1, 1, 1, 0]
+          })
+          const opacity = scrollY.interpolate({
+            inputRange: [
+            -1, 0,
+            ITEM_SIZE * index,
+            ITEM_SIZE * (index + 0.5)
+            ],
+            outputRange: [1, 1, 1, 0]
+            })
           return (
-            <FlatListItem
-              item={item}
-              index={index}
-              deleteItem={deleteItem}
-              onPress={() => {
-                navigate("Booking", { san: item, index: index });
+            <Animated.View
+              style={{
+                flexDirection: "row",
+                padding: SPACING,
+                marginBottom: SPACING - 5,
+                backgroundColor: "#ededed",
+                borderRadius: 16,
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 10 },
+                shadowOpacity: 0.3,
+                shadowRadius: 20,
+                elevation: 5,
+                transform: [{scale}],
+                opacity: opacity
               }}
-            ></FlatListItem>
+              // item={item}
+              // index={index}
+              // deleteItem={deleteItem}
+            >
+                <TouchableOpacity
+                style={{
+                  flexDirection: 'row'
+                }}
+                onPress={() => {
+                  navigate("Booking", { san: item, index: index });
+                }}
+                  onLongPress = {() => {
+                    Alert.alert(
+                      "Xóa sân",
+                      `Bạn có chắc chắn xóa sân ${item.nameField}?`,
+                      [
+                        {
+                          text: "No",
+                          onPress: () => console.log("Cancel Pressed"),
+                          style: "cancel",
+                        },
+                        {
+                          text: "Yes",
+                          onPress: () => {
+                            deleteItem(index);
+                          },
+                        },
+                      ],
+                      { cancelable: true }
+                    );
+                  }}
+                >
+                  <Image
+                    source={{ uri: "https://vecgroup.vn/upload_images/images/2021/12/09/kich-thuoc-san-bong-11-nguoi(1).png" }}
+                    style={{ width: 80, height: 60, margin: 5 }}
+                  />
+                  <View>
+                    <Text style={{color: '#5567c9', textTransform: 'uppercase', fontWeight: 'bold', margin: 5}}>{`Tên sân: ${item.nameField}`}</Text>
+                    <Text style={{marginLeft: 5}}>{`Loại sân: ${item.typeField}`}</Text>
+                    <Text style={{marginLeft: 5}}>{`Giá: ${item.priceField}k`}</Text>
+                  </View>
+                </TouchableOpacity>
+            </Animated.View>
           );
         }}
-      ></FlatList>
+        showsHorizontalScrollIndicator={false}
+      />
       <Modal
         animationType="slide"
         transparent={true}
@@ -272,25 +320,33 @@ function FlatListSan(props) {
               placeholderTextColor={colors.placeholder}
               keyboardType="numeric"
             />
-            <View style={{ flexDirection: "row" }}>
-              <Pressable
-                style={[styles.button, styles.buttonClose, styles.colorRed]}
-                onPress={() => setModalVisible(!modalVisible)}
-              >
-                <Text style={styles.textStyle}>Cancel</Text>
+            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+              {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
+              <Pressable style={[ styles.button, styles.buttonClose ]} 
+              title="Choose Image"
+              onPress={pickImage} >
+                <Text style={styles.textStyle}>Choose Image</Text>
               </Pressable>
 
-              <Pressable
-                style={[styles.button, styles.buttonClose]}
-                onPress={saveOnPress}
-              >
-                <Text style={styles.textStyle}>Save</Text>
-              </Pressable>
+              <View style={{ flexDirection: "row", marginTop: 5 }}>
+                <Pressable
+                  style={[styles.button, styles.buttonClose, styles.colorRed]}
+                  onPress={() => setModalVisible(!modalVisible)}
+                >
+                  <Text style={styles.textStyle}>Cancel</Text>
+                </Pressable>
+
+                <Pressable
+                  style={[styles.button, styles.buttonClose]}
+                  onPress={saveOnPress}
+                >
+                  <Text style={styles.textStyle}>Save</Text>
+                </Pressable>
+              </View>
             </View>
           </View>
         </View>
       </Modal>
-      
     </View>
   );
 }
@@ -322,6 +378,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 10,
     elevation: 2,
+    backgroundColor: 'blue',
+    margin: 5
   },
   buttonOpen: {
     backgroundColor: "#F194FF",
