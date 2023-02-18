@@ -110,11 +110,7 @@ function Login(props) {
             marginRight: 10,
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
-            shadowColor: '#000',
-            shadowOffset: { width: 1, height: 1 },
-            shadowOpacity:  0.4,
-            shadowRadius: 3,
-            elevation: 5,
+            
 
         }}>
             <View style={{
@@ -206,7 +202,6 @@ function Login(props) {
             marginRight: 10,
             borderBottomLeftRadius: 20,
             borderBottomRightRadius: 20,
-
         }}>
             <TouchableOpacity
                 disabled = {isValidationOK() == false}

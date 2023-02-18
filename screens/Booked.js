@@ -3,47 +3,15 @@ import {
   Text,
   View,
   Image,
-  ImageBackground,
-  TouchableOpacity,
-  TextInput,
-  KeyboardAvoidingView,
-  Keyboard,
-  ScrollView,
-  Button,
-  SafeAreaView,
-  StyleSheet,
-  RefreshControl,
-  ActivityIndicator,
-  TouchableWithoutFeedback,
   Animated,
-  Dimensions,
-  FlatList,
-  Pressable,
-  Alert,
   StatusBar,
 } from "react-native";
-import { images, colors, icons, fontSizes } from "../constants";
-import Icon from "react-native-vector-icons/FontAwesome5";
-import { isValidEmail, isValidPassword } from "../utilies/Validations";
 import { UIHeader } from "../components";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import { FlatListSan } from "../components";
-import { Calendar, CalendarList, Agenda } from "react-native-calendars";
-import Timeline from "react-native-timeline-flatlist";
-import Modal from "react-native-modal";
-import { LocaleConfig } from "react-native-calendars";
-import san from "../data/san";
-import CalendarPicker from "react-native-calendar-picker";
 import {
-  onAuthStateChanged,
   firebaseDatabaseRef,
-  firebaseSet,
   firebaseDatabase,
   auth,
-  createUserWithEmailAndPassword,
-  sendEmailVerification,
   onValue,
-  update,
 } from "../firebase/firebase";
 
 function Booked(props) {
@@ -82,6 +50,11 @@ function Booked(props) {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
+      <UIHeader
+        title="Danh sách sân đã đặt"
+      >
+        
+      </UIHeader>
       <Animated.FlatList
         data={data}
         onScroll={Animated.event([
@@ -104,21 +77,21 @@ function Booked(props) {
         }}
         renderItem={({ item, index }) => {
           const scale = scrollY.interpolate({
-                      inputRange: [
-                        -1, 0,
-                        ITEM_SIZE * index,
-                        ITEM_SIZE * (index + 2)
-                      ],
-                      outputRange: [1, 1, 1, 0]
-                    })
-                    const opacity = scrollY.interpolate({
-                      inputRange: [
-                        -1, 0,
-                        ITEM_SIZE * index,
-                        ITEM_SIZE * (index + 0.5)
-                      ],
-                      outputRange: [1, 1, 1, 0]
-                    })
+            inputRange: [
+              -1, 0,
+              ITEM_SIZE * index,
+              ITEM_SIZE * (index + 4)
+            ],
+              outputRange: [1, 1, 1, 0]
+            })
+          const opacity = scrollY.interpolate({
+            inputRange: [
+              -1, 0,
+              ITEM_SIZE * index,
+              ITEM_SIZE * (index + 0.5)
+            ],
+              outputRange: [1, 1, 1, 0]
+            })         
           return (
             <Animated.View
               style={{
@@ -165,17 +138,17 @@ function Booked(props) {
                 }}
               />
               <View>
-                <Text style={{ fontSize: 22, fontWeight: "700" }}>
-                  {item.nameCus}
+                <Text style={{ fontSize: 20, fontWeight: "700" }}>
+                  Tên khách hàng: {item.nameCus}
                 </Text>
-                <Text style={{ fontSize: 18, opacity: 0.7 }}>
-                  {item.nameField}
+                <Text style={{ fontSize: 16, opacity: 0.7 }}>
+                  Tên sân: {item.nameField}
                 </Text>
-                <Text style={{ fontSize: 18, opacity: 0.7 }}>
-                  {item.phoneCus}
+                <Text style={{ fontSize: 16, opacity: 0.7 }}>
+                  Số điện thoại: {item.phoneCus}
                 </Text>
-                <Text style={{ fontSize: 18, opacity: 0.7 }}>
-                  {item.priceField}
+                <Text style={{ fontSize: 16, opacity: 0.7 }}>
+                  Giá: {item.priceField}
                 </Text>
               </View>
             </Animated.View>
