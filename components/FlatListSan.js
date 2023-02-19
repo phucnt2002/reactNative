@@ -8,7 +8,7 @@ import {
   StyleSheet,
   Animated,
   StatusBar,
-  Button
+  Button,
 } from "react-native";
 import { Text, Image } from "react-native";
 import { colors } from "../constants";
@@ -22,8 +22,8 @@ import {
   auth,
   onValue,
 } from "../firebase/firebase";
-import dataTime from '../data/dataTime'
-import * as ImagePicker from 'expo-image-picker';
+import dataTime from "../data/dataTime";
+import * as ImagePicker from "expo-image-picker";
 
 // const LeftAction = () => {
 //   console.log("huhu")
@@ -42,12 +42,12 @@ function FlatListSan(props) {
   const AVATAR_SIZE = 70;
   const SPACING = 20;
   const RADIUS = AVATAR_SIZE / 2;
-  const ITEM_SIZE = AVATAR_SIZE + SPACING *3
-  const scrollY = React.useRef(new Animated.Value(0)).current
+  const ITEM_SIZE = AVATAR_SIZE + SPACING * 3;
+  const scrollY = React.useRef(new Animated.Value(0)).current;
 
   props = props.props;
   const responseUser = auth.currentUser;
-  let snapshotObject
+  let snapshotObject;
 
   const [data, setData] = useState([]);
   const [image, setImage] = useState(null);
@@ -80,31 +80,36 @@ function FlatListSan(props) {
   const saveOnPress = () => {
     setModalVisible(!modalVisible);
     if (responseUser) {
-      try{
+      try {
         let user = {
           userID: responseUser.uid,
           timeNow: Date.now(),
-          san: [...data, {
-            nameField: nameField,
-            typeField: value,
-            priceField: priceField,
-            dataTime
-          }],
+          san: [
+            ...data,
+            {
+              nameField: nameField,
+              typeField: value,
+              priceField: priceField,
+              dataTime,
+            },
+          ],
         };
         firebaseSet(
           firebaseDatabaseRef(firebaseDatabase, `field/${responseUser.uid}`),
           user
         );
-      }catch{
+      } catch {
         let user = {
           userID: responseUser.uid,
           timeNow: Date.now(),
-          san: [{
-            nameField: nameField,
-            typeField: value,
-            priceField: priceField,
-            dataTime
-          }],
+          san: [
+            {
+              nameField: nameField,
+              typeField: value,
+              priceField: priceField,
+              dataTime,
+            },
+          ],
         };
         firebaseSet(
           firebaseDatabaseRef(firebaseDatabase, `field/${responseUser.uid}`),
@@ -140,39 +145,36 @@ function FlatListSan(props) {
         if (snapshot.exists()) {
           snapshotObject = snapshot.val();
           const currentUser = responseUser.uid;
-          const dataCurrent = snapshotObject[currentUser]
-          setData(dataCurrent.san)
+          const dataCurrent = snapshotObject[currentUser];
+          setData(dataCurrent.san);
         }
       }
     );
-
   }, []);
 
-    const { navigation, route } = props;
-    const { navigate, goBack } = navigation;
-    console.log("render")
-    
-    // function FlatListItem(props) {
-    //   const { item, index, deleteItem, onPress } = props;
-    //   const handlerLongClick = () => {
-        
-    //   };
-    // }
-    const pickImage = async () => {
-      // No permissions request is necessary for launching the image library
-      let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.All,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
-      });
-  
-      console.log(result);
-  
-      if (!result.canceled) {
-        setImage(result.assets[0].uri);
-      }
-    };
+  const { navigation, route } = props;
+  const { navigate, goBack } = navigation;
+
+  // function FlatListItem(props) {
+  //   const { item, index, deleteItem, onPress } = props;
+  //   const handlerLongClick = () => {
+
+  //   };
+  // }
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
   return (
     <View>
       <UIHeader
@@ -184,21 +186,20 @@ function FlatListSan(props) {
         }}
       ></UIHeader>
       {/* {nullData ? : <View style={{flex:1, justifyContent: 'center', alignItems: 'center', color: 'black'}}><Text>Chua co du lieu</Text></View>} */}
-      <View style={{flex:1}}>
-        
-      </View>
+      {/* <View style={{ flex: 1 }}></View> */}
       <Animated.FlatList
         data={data}
-        onScroll={Animated.event([
-          {
-            nativeEvent: {
-              contentOffset: {
-                y: scrollY
-              }
-            }
-          }
-        ], 
-         { useNativeDriver: true } // Add this line
+        onScroll={Animated.event(
+          [
+            {
+              nativeEvent: {
+                contentOffset: {
+                  y: scrollY,
+                },
+              },
+            },
+          ],
+          { useNativeDriver: true } // Add this line
         )}
         keyExtractor={(item) => item.key}
         contentContainerStyle={{
@@ -207,84 +208,92 @@ function FlatListSan(props) {
         }}
         renderItem={({ item, index }) => {
           const scale = scrollY.interpolate({
-            inputRange: [
-              -1, 0,
-              ITEM_SIZE * index,
-              ITEM_SIZE * (index + 2)
-            ],
-            outputRange: [1, 1, 1, 0]
-          })
+            inputRange: [-1, 0, ITEM_SIZE * index, ITEM_SIZE * (index + 2)],
+            outputRange: [1, 1, 1, 0],
+          });
           const opacity = scrollY.interpolate({
-            inputRange: [
-            -1, 0,
-            ITEM_SIZE * index,
-            ITEM_SIZE * (index + 0.5)
-            ],
-            outputRange: [1, 1, 1, 0]
-            })
+            inputRange: [-1, 0, ITEM_SIZE * index, ITEM_SIZE * (index + 0.5)],
+            outputRange: [1, 1, 1, 0],
+          });
           return (
             <Animated.View
               style={{
                 flexDirection: "row",
-                padding: SPACING,
+                backgroundColor: "white",
+                backgroundColor: "#ededed",   
+                // padding: SPACING,
                 marginBottom: SPACING - 5,
-                backgroundColor: "#ededed",
                 borderRadius: 16,
                 shadowColor: "#000",
                 shadowOffset: { width: 0, height: 10 },
                 shadowOpacity: 0.3,
                 shadowRadius: 20,
                 elevation: 5,
-                transform: [{scale}],
-                opacity: opacity
+                transform: [{ scale }],
+                opacity: opacity,
               }}
-              // item={item}
-              // index={index}
-              // deleteItem={deleteItem}
             >
-                <TouchableOpacity
+              <TouchableOpacity
                 style={{
-                  flexDirection: 'row'
+                  flexDirection: "row",
+                  width: '100%',
+                  padding: SPACING,
+
                 }}
                 onPress={() => {
                   navigate("Booking", { san: item, index: index });
                 }}
-                  onLongPress = {() => {
-                    Alert.alert(
-                      "Xóa sân",
-                      `Bạn có chắc chắn xóa sân ${item.nameField}?`,
-                      [
-                        {
-                          text: "No",
-                          onPress: () => console.log("Cancel Pressed"),
-                          style: "cancel",
+                onLongPress={() => {
+                  Alert.alert(
+                    "Xóa sân",
+                    `Bạn có chắc chắn xóa sân ${item.nameField}?`,
+                    [
+                      {
+                        text: "No",
+                        onPress: () => console.log("Cancel Pressed"),
+                        style: "cancel",
+                      },
+                      {
+                        text: "Yes",
+                        onPress: () => {
+                          deleteItem(index);
                         },
-                        {
-                          text: "Yes",
-                          onPress: () => {
-                            deleteItem(index);
-                          },
-                        },
-                      ],
-                      { cancelable: true }
-                    );
+                      },
+                    ],
+                    { cancelable: true }
+                  );
+                }}
+              >
+                <Image
+                  source={{
+                    uri: "https://vecgroup.vn/upload_images/images/2021/12/09/kich-thuoc-san-bong-11-nguoi(1).png",
                   }}
-                >
-                  <Image
-                    source={{ uri: "https://vecgroup.vn/upload_images/images/2021/12/09/kich-thuoc-san-bong-11-nguoi(1).png" }}
-                    style={{ width: 80, height: 60, margin: 5 }}
-                  />
-                  <View>
-                    <Text style={{color: '#5567c9', textTransform: 'uppercase', fontWeight: 'bold', margin: 5}}>{`Tên sân: ${item.nameField}`}</Text>
-                    <Text style={{marginLeft: 5}}>{`Loại sân: ${item.typeField}`}</Text>
-                    <Text style={{marginLeft: 5}}>{`Giá: ${item.priceField}k`}</Text>
-                  </View>
-                </TouchableOpacity>
+                  style={{ width: 80, height: 60, margin: 5 }}
+                />
+                <View>
+                  <Text
+                    style={{
+                      color: "#5567c9",
+                      textTransform: "uppercase",
+                      fontWeight: "bold",
+                      margin: 5,
+                    }}
+                  >{`Tên sân: ${item.nameField}`}</Text>
+                  <Text
+                    style={{ marginLeft: 5 }}
+                  >{`Loại sân: ${item.typeField}`}</Text>
+                  <Text
+                    style={{ marginLeft: 5 }}
+                  >{`Giá: ${item.priceField}k`}</Text>
+                </View>
+              </TouchableOpacity>
             </Animated.View>
           );
         }}
         showsHorizontalScrollIndicator={false}
       />
+
+      <View style={{width: 100, height: 200, backgroundColor: 'red', flex: 1}}></View>
       <Modal
         animationType="slide"
         transparent={true}
@@ -320,11 +329,18 @@ function FlatListSan(props) {
               placeholderTextColor={colors.placeholder}
               keyboardType="numeric"
             />
-            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-              {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
-              <Pressable style={[ styles.button, styles.buttonClose ]} 
-              title="Choose Image"
-              onPress={pickImage} >
+            <View style={{ alignItems: "center", justifyContent: "center" }}>
+              {image && (
+                <Image
+                  source={{ uri: image }}
+                  style={{ width: 200, height: 200 }}
+                />
+              )}
+              <Pressable
+                style={[styles.button, styles.buttonClose]}
+                title="Choose Image"
+                onPress={pickImage}
+              >
                 <Text style={styles.textStyle}>Choose Image</Text>
               </Pressable>
 
@@ -378,8 +394,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 10,
     elevation: 2,
-    backgroundColor: 'blue',
-    margin: 5
+    backgroundColor: "blue",
+    margin: 5,
   },
   buttonOpen: {
     backgroundColor: "#F194FF",
