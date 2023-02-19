@@ -5,6 +5,7 @@ import {
   Image,
   Animated,
   StatusBar,
+  TouchableOpacity,
 } from "react-native";
 import { UIHeader } from "../components";
 import {
@@ -18,8 +19,10 @@ function Booked(props) {
   const AVATAR_SIZE = 70;
   const SPACING = 20;
   const RADIUS = AVATAR_SIZE / 2;
-  const ITEM_SIZE = AVATAR_SIZE + SPACING *3
+  const ITEM_SIZE = AVATAR_SIZE + SPACING * 3;
   const [data, setData] = useState([]);
+  const { navigation, route } = props;
+  const { navigate, goBack } = navigation;
   useEffect(() => {
     onValue(
       firebaseDatabaseRef(firebaseDatabase, "bookingTable"),
@@ -46,27 +49,24 @@ function Booked(props) {
       }
     );
   }, []);
-  const scrollY = React.useRef(new Animated.Value(0)).current
+  const scrollY = React.useRef(new Animated.Value(0)).current;
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
-      <UIHeader
-        title="Danh sách sân đã đặt"
-      >
-        
-      </UIHeader>
+      <UIHeader title="Danh sách sân đã đặt"></UIHeader>
       <Animated.FlatList
         data={data}
-        onScroll={Animated.event([
-          {
-            nativeEvent: {
-              contentOffset: {
-                y: scrollY
-              }
-            }
-          }
-        ], 
-         { useNativeDriver: true } // Add this line
+        onScroll={Animated.event(
+          [
+            {
+              nativeEvent: {
+                contentOffset: {
+                  y: scrollY,
+                },
+              },
+            },
+          ],
+          { useNativeDriver: true } // Add this line
         )}
         keyExtractor={(item) => {
           item.key;
@@ -77,26 +77,17 @@ function Booked(props) {
         }}
         renderItem={({ item, index }) => {
           const scale = scrollY.interpolate({
-            inputRange: [
-              -1, 0,
-              ITEM_SIZE * index,
-              ITEM_SIZE * (index + 4)
-            ],
-              outputRange: [1, 1, 1, 0]
-            })
+            inputRange: [-1, 0, ITEM_SIZE * index, ITEM_SIZE * (index + 2)],
+            outputRange: [1, 1, 1, 0],
+          });
           const opacity = scrollY.interpolate({
-            inputRange: [
-              -1, 0,
-              ITEM_SIZE * index,
-              ITEM_SIZE * (index + 0.5)
-            ],
-              outputRange: [1, 1, 1, 0]
-            })         
+            inputRange: [-1, 0, ITEM_SIZE * index, ITEM_SIZE * (index + 0.5)],
+            outputRange: [1, 1, 1, 0],
+          });
           return (
             <Animated.View
               style={{
                 flexDirection: "row",
-                padding: SPACING,
                 marginBottom: SPACING,
                 backgroundColor: "#ededed",
                 borderRadius: 16,
@@ -105,8 +96,9 @@ function Booked(props) {
                 shadowOpacity: 0.3,
                 shadowRadius: 20,
                 elevation: 5,
-                transform: [{scale}],
-                opacity: opacity
+                alignItems: "center",
+                transform: [{ scale }],
+                opacity: opacity,
               }}
               // style={{
               //   marginHorizontal: 10,
@@ -126,31 +118,46 @@ function Booked(props) {
               //   elevation: 5,
               // }}
             >
-              <Image
-                source={{
-                  uri: "https://noithatbinhminh.com.vn/wp-content/uploads/2022/08/anh-dep-40.jpg",
-                }}
+              <TouchableOpacity
                 style={{
-                  width: AVATAR_SIZE,
-                  height: AVATAR_SIZE,
-                  borderRadius: RADIUS,
-                  marginRight: SPACING / 2,
+                  flexDirection: "row",
+                  width: "100%",
+                  padding: SPACING,
                 }}
-              />
-              <View>
-                <Text style={{ fontSize: 20, fontWeight: "700" }}>
-                  Tên khách hàng: {item.nameCus}
+                onPress={() => navigate("DetailBooked", { booked: item})}
+              >
+                <Image
+                  source={{
+                    uri: "https://noithatbinhminh.com.vn/wp-content/uploads/2022/08/anh-dep-40.jpg",
+                  }}
+                  style={{
+                    width: AVATAR_SIZE,
+                    height: AVATAR_SIZE,
+                    borderRadius: RADIUS,
+                    marginRight: SPACING / 2,
+                  }}
+                />
+                <View>
+                  <Text style={{ fontSize: 20, fontWeight: "700" }}>
+                    Tên: {item.nameCus}
+                  </Text>
+                  <Text style={{ fontSize: 16, opacity: 0.7 }}>
+                    Tên sân: {item.nameField}
+                  </Text>
+                  <Text style={{ fontSize: 16, opacity: 0.7 }}>
+                    Số điện thoại: {item.phoneCus}
+                  </Text>
+                  <Text style={{ fontSize: 16, opacity: 0.7 }}>
+                    Giá: {item.priceField}
+                  </Text>
+                  {/* <Text style={{ fontSize: 16, opacity: 0.7 }}>
+                  Thời gian: {item.daySelect}
                 </Text>
                 <Text style={{ fontSize: 16, opacity: 0.7 }}>
-                  Tên sân: {item.nameField}
-                </Text>
-                <Text style={{ fontSize: 16, opacity: 0.7 }}>
-                  Số điện thoại: {item.phoneCus}
-                </Text>
-                <Text style={{ fontSize: 16, opacity: 0.7 }}>
-                  Giá: {item.priceField}
-                </Text>
-              </View>
+                  Khung giờ: {item.timeBooked}
+                </Text> */}
+                </View>
+              </TouchableOpacity>
             </Animated.View>
           );
         }}
