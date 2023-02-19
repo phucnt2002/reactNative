@@ -73,18 +73,17 @@ function Login(props) {
     //functions of navigate to/back
     // const {navigate, goBack} = navigation
 
-    return <KeyboardAvoidingView 
-    behavior={Platform.OS === "ios" ? "padding" : "height"}
+    return <View     
     style={{
         flex: 100,
-        backgroundColor: 'white'
+        backgroundColor: 'white',
+        
     }}>
         <View style={{
-            flex: 30,
+            flex: 25,
             flexDirection: 'row',            
             justifyContent: 'space-around',
-            alignItems: 'center',
-            
+            alignItems: 'center'
         }}>
             <Text style={{
                 color: 'black',
@@ -93,7 +92,7 @@ function Login(props) {
                 width: '50%'
             }}>Already have an Account?</Text>
             <Image
-                // tintColor = {colors.primary}
+                // tintColor = {'black'}
                 source={
                     images.logo
                 } style={{
@@ -103,23 +102,24 @@ function Login(props) {
                 }} />
         </View>
         <View style={{
-            flex: 20,
+            flex: 30,
             backgroundColor: '#E17A8D',
             padding: 10,
-            marginLeft: 10,
-            marginRight: 10,
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
-            
-
+            margin: 10,
+            borderRadius: 20,
+            shadowColor: '#000',
+            shadowOffset: { width: 1, height: 1 },
+            shadowOpacity:  0.4,
+            shadowRadius: 3,
+            elevation: 5,
         }}>
             <View style={{
                 marginHorizontal: 15
             }}>
                 <Text style={{
                     fontSize: 18,
-                    color: '#001949',
-                    marginTop: 15
+                    color: 'black',
+                    marginTop: 25
                 }}>Email:</Text>
                 <TextInput
                     onChangeText={(text)=>{
@@ -137,15 +137,13 @@ function Login(props) {
                     style={{
                         color: 'black',
                         marginTop: 5
-
                     }}
-                    keyboardType='email'
                     placeholder='example@gmail.com'
                     value={email}
                     placeholderTextColor={colors.placeholder}
                 />
                 <View style={{height: 1, 
-                    backgroundColor: '#001949', 
+                    backgroundColor: 'black', 
                     width: '100%',                    
                     marginHorizontal: 15,
                     marginBottom: 5,
@@ -154,7 +152,7 @@ function Login(props) {
                 <Text style={{
                     color: 'red', 
                     fontSize: fontSizes.h6,
-                    marginBottom: 15,
+                    marginBottom: 10,
                     }}>{errorEmail}</Text>
             </View>
             <View style={{
@@ -162,28 +160,26 @@ function Login(props) {
             }}>
                 <Text style={{
                     fontSize: 18,
-                    color: '#001949'
+                    color: 'black'
                 }}>Password:</Text>
                 <TextInput
                     onChangeText={(text)=>{
                         setErrorPassword(isValidPassword(text) == true ? 
                                     '' : 'Password must be at least 3 characters')
                         setPassword(text)    
-                    }}                    
+                    }}
                     style={{
-                        color: 'black',
-                        marginTop: 5
-
+                        color: 'black'
                     }}
                     secureTextEntry={true}
-                    placeholder='Enter your password'
                     value={password}
+                    placeholder='Enter your password'
                     placeholderTextColor={colors.placeholder}
                 />
                 <View style={{height: 1, 
-                    backgroundColor: '#001949', 
+                    backgroundColor: 'black', 
                     width: '100%',
-                    marginBottom: 15,
+                    marginBottom: 10,
                     marginHorizontal: 15,
                     alignSelf: 'center'
                 }} />
@@ -193,16 +189,7 @@ function Login(props) {
                     marginBottom: 15,                    
                     }}>{errorPassword}</Text>
             </View>
-        </View>
-        {keyboardIsShown == false ? <View style={{
-            flex: 10,
-            backgroundColor: '#E17A8D',
-            padding: 10,
-            marginLeft: 10,
-            marginRight: 10,
-            borderBottomLeftRadius: 20,
-            borderBottomRightRadius: 20,
-        }}>
+            
             <TouchableOpacity
                 disabled = {isValidationOK() == false}
                 onPress={() => {
@@ -222,14 +209,15 @@ function Login(props) {
                     alignItems: 'center',
                     width: '50%',
                     alignSelf: 'center',
-                    borderRadius: 18
+                    borderRadius: 18,
+                    marginTop: 20
                 }}>
                 <Text style={{
                     padding: 8,
                     fontSize: fontSizes.h5,
                     color: 'white'
                 }}>Login</Text>
-            </TouchableOpacity>
+            </TouchableOpacity>  
             <TouchableOpacity
                 onPress={() => {
                     navigate('Register')
@@ -238,23 +226,20 @@ function Login(props) {
                 <Text style={{
                     padding: 8,
                     fontSize: fontSizes.h6,
-                    color: '#001949',
+                    color: 'black',
                     alignSelf: 'center',
-                }}>New user? Register now</Text>
+                }}>Register</Text>
             </TouchableOpacity>
-
-        </View> : <View style={{
-            flex: 15
-        }}></View>}
+        </View>
+        
         {keyboardIsShown == false ? <View style={{
-            flex: 30,            
+            flex: 20,            
         }}>
             <View style={{
                 height: 40,
                 flexDirection: 'row',   
                 alignItems: 'center',
-                marginHorizontal: 20,
-                marginTop: 10
+                marginHorizontal: 20
             }}>
                 <View style={{height: 1, backgroundColor: 'black', flex: 1}} />
                 <Text style={{
@@ -262,22 +247,23 @@ function Login(props) {
                     fontSize: fontSizes.h6,
                     color: '#E17A8D',
                     alignSelf: 'center',
-                    marginHorizontal: 5
+                    marginHorizontal: 5,
                 }}>Use other methods ?</Text>
                 <View style={{height: 1, backgroundColor: 'black', flex: 1}} />
             </View>
             <View style={{
                 flexDirection: 'row',
-                justifyContent: 'center',
-                marginTop:15
+                justifyContent: 'center'
             }}>
                 <Icon name='facebook' size={35} color={colors.facebook} />
                 <View style={{width: 15}}/>
                 <Icon name='google' size={35} color={colors.google} />
             </View>
+
         </View> : <View style={{
             flex: 25,            
         }}></View>}
-    </KeyboardAvoidingView>
+    </View> 
 }
+
 export default Login
