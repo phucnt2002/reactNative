@@ -115,7 +115,7 @@ LocaleConfig.defaultLocale = "fr";
       alert("Chọn thời gian")
     }
   };
-
+  
   const saveOnPress = () => {
     if (nameCus == "" || phoneCus == "") {
       alert("Vui lòng điền đủ thông tin");
