@@ -126,7 +126,7 @@ LocaleConfig.defaultLocale = "fr";
         priceField: priceField,
         typeField: typeField,
         userID: auth.currentUser.uid,
-        timeHourseBookinged: data.findIndex((item)=> item.isBooking==null),
+        timeBooked: data.findIndex((item)=> item.isBooking==null),
         daySelect: daySelect,
         nameCus: nameCus,
         phoneCus: phoneCus
