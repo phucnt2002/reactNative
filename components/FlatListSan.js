@@ -9,8 +9,9 @@ import {
   Animated,
   StatusBar,
   Button,
+  Text,
+  Image,
 } from "react-native";
-import { Text, Image } from "react-native";
 import { colors } from "../constants";
 import React, { useEffect, useState } from "react";
 import UIHeader from "./UIHeader";
@@ -24,157 +25,235 @@ import {
 } from "../firebase/firebase";
 import dataTime from "../data/dataTime";
 import * as ImagePicker from "expo-image-picker";
+import * as SQLite from "expo-sqlite";
+import * as Sharing from "expo-sharing";
+import * as FileSystem from "expo-file-system";
+import * as DocumentPicker from "expo-document-picker";
 
-// const LeftAction = () => {
-//   console.log("huhu")
-//   return (
-//     <View
-//       style={{ backgroundColor: "#388e3c", justifyContent: "center", flex: 1 }}
-//     >
-//       <Text style={{ color: "#fff", fontWeight: "600", padding: 20 }}>
-//         Delete
-//       </Text>
-//     </View>
-//   );
-// };
-
-function FlatListSan(props) {
+export default function FlatListSan(props) {
+  props = props.props;
   const AVATAR_SIZE = 70;
   const SPACING = 20;
   const RADIUS = AVATAR_SIZE / 2;
   const ITEM_SIZE = AVATAR_SIZE + SPACING * 3;
   const scrollY = React.useRef(new Animated.Value(0)).current;
 
-  props = props.props;
   const responseUser = auth.currentUser;
-  let snapshotObject;
 
+  const [db, setDb] = useState(SQLite.openDatabase("san.db"));
+  const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState([]);
-  const [image, setImage] = useState(null);
+  const [currentName, setCurrentName] = useState(undefined);
+  const [modalVisible, setModalVisible] = useState(false);
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(null);
   const [items, setItems] = useState([
     { label: "Sân 5", value: "Sân 5" },
     { label: "Sân 7", value: "Sân 7" },
     { label: "Sân 9", value: "Sân 9" },
     { label: "Sân 11", value: "Sân 11" },
   ]);
-  const [nameField, setNameField] = useState("");
-  const [priceField, setPriceField] = useState("");
-  const [nullData, setNullData] = useState(true);
-  const deleteItem = (index) => {
-    data.splice(index, 1);
-    setData(data);
-    if (responseUser) {
-      let user = {
-        userID: responseUser.uid,
-        san: data,
-      };
-      firebaseSet(
-        firebaseDatabaseRef(firebaseDatabase, `field/${responseUser.uid}`),
-        user
-      );
-    }
-  };
 
-  const saveOnPress = () => {
-    setModalVisible(!modalVisible);
-    if (responseUser) {
-      try {
-        let user = {
-          userID: responseUser.uid,
-          timeNow: Date.now(),
-          san: [
-            ...data,
-            {
-              nameField: nameField,
-              typeField: value,
-              priceField: priceField,
-              dataTime,
-            },
-          ],
-        };
-        firebaseSet(
-          firebaseDatabaseRef(firebaseDatabase, `field/${responseUser.uid}`),
-          user
-        );
-      } catch {
-        let user = {
-          userID: responseUser.uid,
-          timeNow: Date.now(),
-          san: [
-            {
-              nameField: nameField,
-              typeField: value,
-              priceField: priceField,
-              dataTime,
-            },
-          ],
-        };
-        firebaseSet(
-          firebaseDatabaseRef(firebaseDatabase, `field/${responseUser.uid}`),
-          user
-        );
-      }
-    }
-
-    // onAuthStateChanged(auth, (responseUser) => {
-    //   debugger;
-    //   if (responseUser) {
-    //     let user = {
-    //       userID: responseUser.uid,
-    //       san: {
-    //         nameField: nameField,
-    //         typeField: value,
-    //         priceField: priceField,
-    //       },
-    //     };
-    //     firebaseSet(
-    //       firebaseDatabaseRef(firebaseDatabase, `field/${responseUser.uid}`),
-    //       user
-    //     );
-    //   }
-    // });
-  };
-  const [modalVisible, setModalVisible] = useState(false);
-
-  useEffect(() => {
-    onValue(
-      firebaseDatabaseRef(firebaseDatabase, "field"),
-      async (snapshot) => {
-        if (snapshot.exists()) {
-          snapshotObject = snapshot.val();
-          const currentUser = responseUser.uid;
-          const dataCurrent = snapshotObject[currentUser];
-          setData(dataCurrent.san);
-        }
-      }
-    );
-  }, []);
+  const [fieldName, setFieldName] = useState();
+  const [fieldAddress, setFieldAddress] = useState();
+  const [fieldOwnerID, setFieldOwnerID] = useState();
+  const [fieldType, setFieldType] = useState(null);
+  const [fieldPrice, setFieldPrice] = useState();
 
   const { navigation, route } = props;
   const { navigate, goBack } = navigation;
 
-  // function FlatListItem(props) {
-  //   const { item, index, deleteItem, onPress } = props;
-  //   const handlerLongClick = () => {
+  const saveOnPress = () => {};
 
-  //   };
-  // }
-  const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
+  const exportDb = async () => {
+    if (Platform.OS === "android") {
+      const permissions =
+        await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+      if (permissions.granted) {
+        const base64 = await FileSystem.readAsStringAsync(
+          FileSystem.documentDirectory + "SQLite/example.db",
+          {
+            encoding: FileSystem.EncodingType.Base64,
+          }
+        );
 
-
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
+        await FileSystem.StorageAccessFramework.createFileAsync(
+          permissions.directoryUri,
+          "example.db",
+          "application/octet-stream"
+        )
+          .then(async (uri) => {
+            await FileSystem.writeAsStringAsync(uri, base64, {
+              encoding: FileSystem.EncodingType.Base64,
+            });
+          })
+          .catch((e) => console.log(e));
+      } else {
+        console.log("Permission not granted");
+      }
+    } else {
+      await Sharing.shareAsync(
+        FileSystem.documentDirectory + "SQLite/example.db"
+      );
     }
   };
+
+  const importDb = async () => {
+    let result = await DocumentPicker.getDocumentAsync({
+      copyToCacheDirectory: true,
+    });
+
+    if (result.type === "success") {
+      setIsLoading(true);
+
+      if (
+        !(
+          await FileSystem.getInfoAsync(FileSystem.documentDirectory + "SQLite")
+        ).exists
+      ) {
+        await FileSystem.makeDirectoryAsync(
+          FileSystem.documentDirectory + "SQLite"
+        );
+      }
+
+      const base64 = await FileSystem.readAsStringAsync(result.uri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      await FileSystem.writeAsStringAsync(
+        FileSystem.documentDirectory + "SQLite/example.db",
+        base64,
+        { encoding: FileSystem.EncodingType.Base64 }
+      );
+      await db.closeAsync();
+      setDb(SQLite.openDatabase("example.db"));
+    }
+  };
+
+  const getDataFromDatabase = () => {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        tx.executeSql(
+          "SELECT * FROM Fields WHERE FieldOwnerID = ?",
+          [responseUser.uid],
+          (_, { rows: { _array } }) => {
+            resolve(_array);
+          },
+          (_, error) => {
+            reject(error);
+          }
+        );
+      });
+    });
+  };
+
+  const fetchData = async () => {
+    try {
+      const data = await getDataFromDatabase();
+      setData(data);
+      console.log(data); // xử lý dữ liệu ở đây
+    } catch (error) {
+      console.log("Lỗi truy vấn cơ sở dữ liệu", error);
+    }
+  };
+
+  useEffect(() => {
+    //create table Field and Owners
+    db.transaction((tx) => {
+      tx.executeSql(
+        "CREATE TABLE IF NOT EXISTS Fields (FieldID INTEGER PRIMARY KEY AUTOINCREMENT, FieldName TEXT, FieldAddress TEXT, FieldOwnerID TEXT, FieldType TEXT, FieldPrice TEXT)",
+        []
+      );
+      tx.executeSql(
+        "CREATE TABLE IF NOT EXISTS Owners (OwnerID INTEGER PRIMARY KEY AUTOINCREMENT, OwnerName TEXT, OwnerAddress TEXT, OwnerPhone TEXT, OwnerEmail TEXT, OwnerUsername TEXT, OwnerPassword TEXT)",
+        []
+      );
+    });
+    fetchData();
+    setIsLoading(false);
+  }, []);
+
+  const addField = () => {
+    setModalVisible(!modalVisible);
+    console.log(db);
+    db.transaction((tx) => {
+      console.log(
+        "Inserting field:",
+        fieldName,
+        fieldAddress,
+        fieldOwnerID,
+        fieldType,
+        fieldPrice
+      );
+      const ownerId = responseUser.uid ? responseUser.uid : null;
+
+      tx.executeSql(
+        "INSERT INTO Fields (FieldName, FieldAddress, FieldOwnerID, FieldType, FieldPrice) VALUES (?, ?, ?, ?, ?)",
+        [fieldName, fieldAddress, ownerId, fieldType, fieldPrice],
+        (_, { rowsAffected }) => {
+          console.log("Insertion result:", rowsAffected);
+          if (rowsAffected > 0) {
+            console.log("Sân đã được thêm vào cơ sở dữ liệu.");
+            fetchData();
+          } else {
+            console.log("Không thể thêm sân vào cơ sở dữ liệu.");
+          }
+        },
+        (_, error) => {
+          console.log("Insertion error:", error);
+        }
+      );
+    });
+  };
+
+  const deleteName = (id) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "DELETE FROM names WHERE id = ?",
+        [id],
+        (txObj, resultSet) => {
+          if (resultSet.rowsAffected > 0) {
+            let existingNames = [...names].filter((name) => name.id !== id);
+            setData(existingNames);
+          }
+        },
+        (txObj, error) => console.log(error)
+      );
+    });
+  };
+
+  const updateName = (id) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "UPDATE names SET name = ? WHERE id = ?",
+        [currentName, id],
+        (txObj, resultSet) => {
+          if (resultSet.rowsAffected > 0) {
+            let existingNames = [...names];
+            const indexToUpdate = existingNames.findIndex(
+              (name) => name.id === id
+            );
+            existingNames[indexToUpdate].name = currentName;
+            setData(existingNames);
+            setCurrentName(undefined);
+          }
+        },
+        (txObj, error) => console.log(error)
+      );
+    });
+  };
+
+  const showNames = () => {
+    return names.map((name, index) => {
+      return (
+        <View key={index} style={styles.row}>
+          <Text>{name.name}</Text>
+          <Button title="Delete" onPress={() => deleteName(name.id)} />
+          <Button title="Update" onPress={() => updateName(name.id)} />
+        </View>
+      );
+    });
+  };
+
   return (
     <View>
       <UIHeader
@@ -185,8 +264,7 @@ function FlatListSan(props) {
           setModalVisible(true);
         }}
       ></UIHeader>
-      {/* {nullData ? : <View style={{flex:1, justifyContent: 'center', alignItems: 'center', color: 'black'}}><Text>Chua co du lieu</Text></View>} */}
-      {/* <View style={{ flex: 1 }}></View> */}
+
       <Animated.FlatList
         data={data}
         onScroll={Animated.event(
@@ -220,7 +298,7 @@ function FlatListSan(props) {
               style={{
                 flexDirection: "row",
                 backgroundColor: "white",
-                backgroundColor: "#ededed",   
+                backgroundColor: "#ededed",
                 // padding: SPACING,
                 marginBottom: SPACING - 5,
                 borderRadius: 16,
@@ -236,9 +314,8 @@ function FlatListSan(props) {
               <TouchableOpacity
                 style={{
                   flexDirection: "row",
-                  width: '100%',
+                  width: "100%",
                   padding: SPACING,
-
                 }}
                 onPress={() => {
                   navigate("Booking", { san: item, index: index });
@@ -246,7 +323,7 @@ function FlatListSan(props) {
                 onLongPress={() => {
                   Alert.alert(
                     "Xóa sân",
-                    `Bạn có chắc chắn xóa sân ${item.nameField}?`,
+                    `Bạn có chắc chắn xóa sân ${item.FieldName}?`,
                     [
                       {
                         text: "No",
@@ -278,13 +355,13 @@ function FlatListSan(props) {
                       fontWeight: "bold",
                       margin: 5,
                     }}
-                  >{`Tên sân: ${item.nameField}`}</Text>
+                  >{`Tên sân: ${item.FieldName}`}</Text>
                   <Text
                     style={{ marginLeft: 5 }}
-                  >{`Loại sân: ${item.typeField}`}</Text>
+                  >{`Loại sân: ${item.FieldType}`}</Text>
                   <Text
                     style={{ marginLeft: 5 }}
-                  >{`Giá: ${item.priceField}k`}</Text>
+                  >{`Giá: ${item.FieldPrice}k`}</Text>
                 </View>
               </TouchableOpacity>
             </Animated.View>
@@ -293,7 +370,6 @@ function FlatListSan(props) {
         showsHorizontalScrollIndicator={false}
       />
 
-      <View style={{width: 100, height: 200, backgroundColor: 'red', flex: 1}}></View>
       <Modal
         animationType="slide"
         transparent={true}
@@ -306,7 +382,7 @@ function FlatListSan(props) {
           <View style={styles.modalView}>
             <TextInput
               onChangeText={(text) => {
-                setNameField(text);
+                setFieldName(text);
               }}
               style={styles.input}
               placeholder="Tên sân"
@@ -314,36 +390,30 @@ function FlatListSan(props) {
             />
             <DropDownPicker
               open={open}
-              value={value}
+              value={fieldType}
               items={items}
               setOpen={setOpen}
-              setValue={setValue}
+              setValue={setFieldType}
               setItems={setItems}
             />
             <TextInput
               onChangeText={(text) => {
-                setPriceField(text);
+                setFieldPrice(text);
               }}
               style={styles.input}
               placeholder="Giá"
               placeholderTextColor={colors.placeholder}
               keyboardType="numeric"
             />
+            <TextInput
+              onChangeText={(text) => {
+                setFieldAddress(text);
+              }}
+              style={styles.input}
+              placeholder="Địa chỉ"
+              placeholderTextColor={colors.placeholder}
+            />
             <View style={{ alignItems: "center", justifyContent: "center" }}>
-              {image && (
-                <Image
-                  source={{ uri: image }}
-                  style={{ width: 200, height: 200 }}
-                />
-              )}
-              <Pressable
-                style={[styles.button, styles.buttonClose]}
-                title="Choose Image"
-                onPress={pickImage}
-              >
-                <Text style={styles.textStyle}>Choose Image</Text>
-              </Pressable>
-
               <View style={{ flexDirection: "row", marginTop: 5 }}>
                 <Pressable
                   style={[styles.button, styles.buttonClose, styles.colorRed]}
@@ -354,7 +424,7 @@ function FlatListSan(props) {
 
                 <Pressable
                   style={[styles.button, styles.buttonClose]}
-                  onPress={saveOnPress}
+                  onPress={addField}
                 >
                   <Text style={styles.textStyle}>Save</Text>
                 </Pressable>
@@ -366,7 +436,21 @@ function FlatListSan(props) {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "stretch",
+    justifyContent: "space-between",
+    margin: 8,
+  },
   centeredView: {
     flex: 1,
     justifyContent: "center",
@@ -426,4 +510,3 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
 });
-export default FlatListSan;
