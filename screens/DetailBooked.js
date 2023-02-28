@@ -63,7 +63,7 @@ function DetailBooked(props) {
           <View style={styles.mediaImageContainer}>
             <Image
               source={{
-                uri: "https://co-nhan-tao.com/wp-content/uploads/2021/12/co-nhan-tao-san-bong-chuyen-1-768x1024.jpg",
+                uri: "https://co-nhan-tao.com/wp-content/uploads/2021/08/san-bong-7-nguoi.jpg",
               }}
               style={styles.image}
               resizeMode="cover"

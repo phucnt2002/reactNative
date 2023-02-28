@@ -9,19 +9,21 @@ import {
   Dimensions,
   FlatList,
   Pressable,
-  Button
+  Button,
 } from "react-native";
 import { images, colors, fontSizes } from "../constants";
 import { UIHeader } from "../components";
 import Modal from "react-native-modal";
 import { LocaleConfig } from "react-native-calendars";
-import CalendarPicker from 'react-native-calendar-picker';
+import CalendarPicker from "react-native-calendar-picker";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import {
   firebaseDatabaseRef,
   firebaseSet,
   firebaseDatabase,
   auth,
-  onValue} from "../firebase/firebase";
+  onValue,
+} from "../firebase/firebase";
 LocaleConfig.locales["fr"] = {
   monthNames: [
     "January",
@@ -64,152 +66,112 @@ LocaleConfig.locales["fr"] = {
   today: "Today",
 };
 LocaleConfig.defaultLocale = "fr";
- function Booking(props) {
-  const { key, nameField, typeField, priceField, img, dataTime } =
-    props.route.params.san;
-  const  index  = props.route.params.index;
+import * as SQLite from "expo-sqlite";
+
+function Booking(props) {
+  const {
+    FieldAddress,
+    FieldID,
+    FieldName,
+    FieldOwnerID,
+    FieldPrice,
+    FieldType,
+  } = props.route.params.san;
+  const index = props.route.params.index;
   const minDate = new Date();
   const responseUser = auth.currentUser;
   const { navigate, goBack } = props.navigation;
-  const [data, setData] = useState(dataTime);
+  const [data, setData] = useState();
   const [modalVisible, setModalVisible] = useState(false);
   const [nameCus, setNameCus] = useState("");
   const [phoneCus, setPhoneCus] = useState("");
-  const [daySelect, setDaySelect] = useState(minDate)
+  const [daySelect, setDaySelect] = useState(minDate);
+  const [date, setDate] = useState(new Date());
+  const [mode, setMode] = useState("time");
+  const [isShowDatePicker, setIsShowDatePicker] = useState(false)
+
+  const [db, setDb] = useState(SQLite.openDatabase("san.db"));
 
   const timeChecked = useRef();
   const dataFireBase = useRef();
-  // const timeCalender = useRef();
   const bookingTableDS = useRef();
 
-  useEffect(()=>{
-    onValue(
-      firebaseDatabaseRef(firebaseDatabase, "bookingTable"),
-      async (snapshot) => {
-        if (snapshot.exists()) {
-          snapshotObject = snapshot.val();
-          bookingTableDS.current = snapshotObject
-        }
-      }
-    );
-  }, [])
-  useEffect(() => {
-    console.log("useEffect2")
-    onValue(
-      firebaseDatabaseRef(firebaseDatabase, "field"),
-      async (snapshot) => {
-        if (snapshot.exists()) {
-          snapshotObject = snapshot.val();
-          dataFireBase.current = snapshotObject
-        }
-      }
-    );
+  const getDataFromDatabase = () => {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        tx.executeSql(
+          "SELECT * FROM TimeFields WHERE FieldID = ?",
+          [FieldID],
+          (_, { rows: { _array } }) => {
+            resolve(_array);
+          },
+          (_, error) => {
+            reject(error);
+          }
+        );
+      });
+    });
+  };
 
-  }, []);
-  const onPressBooking = () => {
-    if(timeChecked.current){
-      setModalVisible(true);
-      setPhoneCus("")
-      setNameCus("")
-    }else{
-      alert("Chọn thời gian")
+  const fetchData = async () => {
+    try {
+      const data = await getDataFromDatabase();
+      setData(data);
+      console.log(data); // xử lý dữ liệu ở đây
+    } catch (error) {
+      console.log("Lỗi truy vấn cơ sở dữ liệu", error);
     }
   };
-  
-  const saveOnPress = () => {
-    if (nameCus == "" || phoneCus == "") {
-      alert("Vui lòng điền đủ thông tin");
-      return;
-    } else {
-      const bookingTable = {
-        nameField: nameField,
-        priceField: priceField,
-        typeField: typeField,
-        userID: auth.currentUser.uid,
-        timeBooked: data.findIndex((item)=> item.isBooking==null),
-        daySelect: daySelect,
-        nameCus: nameCus,
-        phoneCus: phoneCus
-      }
-      data.map((item)=>{
-        if(item.isBooking==null){
-          item.isBooking = true
-          item.name = nameCus
-          item.phone = phoneCus
-          item.timeStamp = Date.now()
-        }
-      })
-      dataFireBase.current[auth.currentUser.uid].san[index].dataTime = data
-      firebaseSet(
-        firebaseDatabaseRef(firebaseDatabase, `field`),
-        dataFireBase.current
+
+  const onPressAddTime = () => {
+    setIsShowDatePicker(!isShowDatePicker)
+  };
+  const onPressBooking = () => {};
+  const saveOnPress = () => {};
+
+  useEffect(() => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "CREATE TABLE IF NOT EXISTS TimeFields (FieldID INTEGER, DayBooking TEXT, TimeStart TEXT, TimeEnd TEXT, Price TEXT, Status TEXT)",
+        []
       );
-      try{
-        const listBooked = bookingTableDS.current[auth.currentUser.uid][daySelect]
-        console.log([...listBooked, bookingTable])
-        const up = [...listBooked, bookingTable]
-        firebaseSet(
-          firebaseDatabaseRef(firebaseDatabase, `bookingTable/${auth.currentUser.uid}/${daySelect}`),
-          up
-        );
-      }catch{
-        console.log("catch")
-        firebaseSet(
-          firebaseDatabaseRef(firebaseDatabase, `bookingTable/${auth.currentUser.uid}/${daySelect}`),
-          [bookingTable]
-        );
-      }
-      setModalVisible(false);
-    }
-  };
+    });
+
+    //truy xuat data trong bang TimeFields
+    fetchData();
+  }, []);
 
   return (
     <View>
       <UIHeader
-        title={nameField}
+        title={FieldName}
         leftIconName={"arrow-left"}
-        //rightIconName={"ellipsis-v"}
+        rightIconName={"plus"}
         onPressLeftIcon={() => {
           goBack();
         }}
-      ></UIHeader>
-      {/* <Calendar
-        onDayPress={day => {
-          const newDay = {
-            [day.dateString]: {selected: true, marked: true, selectedColor: 'blue'}
-          }
-          setDaySelect(newDay)
-          timeCalender.current = day.timestamp
+        onPressRightIcon={() => {
+          onPressAddTime();
         }}
-        markedDates={daySelect}
-        // Enable horizontal scrolling, default = false
-        horizontal={true}
-        // Enable paging on horizontal, default = false
-        pagingEnabled={true}
-        // Set custom calendarWidth.
-        calendarWidth={Dimensions.get("window").width}
-        calendarHeight={Dimensions.get("window").height * 0.4}
-      /> */}
+      ></UIHeader>
       <CalendarPicker
         minDate={minDate}
-        onDateChange={(date)=>{
-          // alert(date)
-          setDaySelect(Date.parse(date.toString()))
+        onDateChange={(date) => {
+          setDaySelect(Date.parse(date.toString()));
         }}
       />
-      {/* <ScrollView>
-        <BookingCalendar
-          defaultRow={defaultRow}
-          startDate={startDate}
-          startTime={startTime}
-          endTime={endTime}
-          intervalMinutes={30}
-          dateTime={dateTimeObj}
-          backgroundColor="#e0e0e0"
-          borderColor="pink"
-          fontColor="blue"
+      {isShowDatePicker ? (
+        <DateTimePicker
+          testID="dateTimePicker"
+          value={date}
+          mode={mode}
+          is24Hour={true}
+          display="default"
+          onChange={() => {}}
         />
-      </ScrollView> */}
+      ) : (
+        <View />
+      )}
       <FlatList
         horizontal={true}
         data={data}
@@ -218,8 +180,8 @@ LocaleConfig.defaultLocale = "fr";
           return item.isBooking != true ? (
             <TouchableOpacity
               onPress={() => {
-                console.log(timeChecked.current)
-                timeChecked.current = true
+                console.log(timeChecked.current);
+                timeChecked.current = true;
                 data.map((item) => {
                   item.isBooking != true
                     ? (item.isBooking = false)
@@ -246,9 +208,7 @@ LocaleConfig.defaultLocale = "fr";
                   resizeMode: "cover",
                   borderRadius: 25,
                 }}
-                source={
-                   images.time
-                }
+                source={images.time}
               />
               <Text>{item.time}</Text>
             </TouchableOpacity>
@@ -260,7 +220,7 @@ LocaleConfig.defaultLocale = "fr";
       <View style={{ ustifyContent: "center", alignItems: "center" }}>
         <TouchableOpacity
           style={{
-            backgroundColor: '#5567C9',
+            backgroundColor: "#5567C9",
             padding: 15,
             width: Dimensions.get("window").width * 0.8,
             justifyContent: "center",
