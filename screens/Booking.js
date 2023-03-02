@@ -10,6 +10,7 @@ import {
   FlatList,
   Pressable,
   Button,
+  Alert,
 } from "react-native";
 import { images, colors, fontSizes } from "../constants";
 import { UIHeader } from "../components";
@@ -68,6 +69,78 @@ LocaleConfig.locales["fr"] = {
 LocaleConfig.defaultLocale = "fr";
 import * as SQLite from "expo-sqlite";
 
+function Item({ item, onPress, selectedId, fetchData }) {
+  const [db, setDb] = useState(SQLite.openDatabase("san.db"));
+  const isSelected = item.TimeID === selectedId;
+  const opacity = isSelected ? 0.3 : 1;
+
+
+  const deleteRow = (db, timeId) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "DELETE FROM TimeFields WHERE TimeID = ?",
+        [timeId],
+        fetchData(),
+        (txObj, error) => console.log("Error deleting row:", error)
+      );
+    });
+  };
+
+  return (
+    <TouchableOpacity
+      onPress={() => {
+        console.log(item);
+        onPress(item.id);
+      }}
+      onLongPress={() => {
+        debugger;
+        Alert.alert(
+          "Xóa sân",
+          `Bạn có chắc chắn xóa sân ${item.nameField}?`,
+          [
+            {
+              text: "No",
+              onPress: () => console.log("Cancel Pressed"),
+              style: "cancel",
+            },
+            {
+              text: "Yes",
+              onPress: () => {
+                deleteRow(db, item.TimeID);
+              },
+            },
+          ],
+          { cancelable: true }
+        );
+      }}
+      style={{
+        padding: 10,
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        opacity: opacity,
+      }}
+    >
+      <Image
+        style={{
+          width: 50,
+          height: 50,
+          resizeMode: "cover",
+          borderRadius: 25,
+        }}
+        source={{
+          uri: "https://vecgroup.vn/upload_images/images/2021/12/09/kich-thuoc-san-bong-11-nguoi(1).png",
+        }}
+      />
+      <Text>{`${new Date(Number(item.TimeStart)).getHours()}:${new Date(
+        Number(item.TimeStart)
+      ).getMinutes()} - ${new Date(Number(item.TimeEnd)).getHours()}:${new Date(
+        Number(item.TimeEnd)
+      ).getMinutes()}`}</Text>
+    </TouchableOpacity>
+  );
+}
+
 function Booking(props) {
   const {
     FieldAddress,
@@ -83,12 +156,20 @@ function Booking(props) {
   const { navigate, goBack } = props.navigation;
   const [data, setData] = useState();
   const [modalVisible, setModalVisible] = useState(false);
+
   const [nameCus, setNameCus] = useState("");
   const [phoneCus, setPhoneCus] = useState("");
-  const [daySelect, setDaySelect] = useState(minDate);
+
+  const [daySelect, setDaySelect] = useState(new Date(minDate).getTime());
   const [date, setDate] = useState(new Date());
   const [mode, setMode] = useState("time");
-  const [isShowDatePicker, setIsShowDatePicker] = useState(false)
+  const [isShowDatePicker, setIsShowDatePicker] = useState(false);
+
+  const [modalAddVisible, setModalAddVisible] = useState(false);
+  const [timeStart, setTimeStart] = useState(null);
+  const [timeEnd, setTimeEnd] = useState(null);
+  const [price, setPrice] = useState("");
+  const [avaiable, setavaiable] = useState(true);
 
   const [db, setDb] = useState(SQLite.openDatabase("san.db"));
 
@@ -96,12 +177,14 @@ function Booking(props) {
   const dataFireBase = useRef();
   const bookingTableDS = useRef();
 
+  const [selectedId, setSelectedId] = useState(null);
+
   const getDataFromDatabase = () => {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
         tx.executeSql(
-          "SELECT * FROM TimeFields WHERE FieldID = ?",
-          [FieldID],
+          "SELECT * FROM TimeFields WHERE FieldID = ? AND DayBooking = ? AND Status =?",
+          [FieldID, daySelect+"", "true"],
           (_, { rows: { _array } }) => {
             resolve(_array);
           },
@@ -124,22 +207,135 @@ function Booking(props) {
   };
 
   const onPressAddTime = () => {
-    setIsShowDatePicker(!isShowDatePicker)
+    setModalAddVisible(!modalAddVisible);
+    setTimeStart(null);
+    setTimeEnd(null);
   };
-  const onPressBooking = () => {};
-  const saveOnPress = () => {};
 
-  useEffect(() => {
+
+  const updateStatus = (db, timeId, newStatus) => {
     db.transaction((tx) => {
       tx.executeSql(
-        "CREATE TABLE IF NOT EXISTS TimeFields (FieldID INTEGER, DayBooking TEXT, TimeStart TEXT, TimeEnd TEXT, Price TEXT, Status TEXT)",
+        "UPDATE TimeFields SET Status = ? WHERE TimeID = ?",
+        [newStatus, timeId],
+        fetchData(),
+        (txObj, error) => console.log("Error updating row:", error)
+      );
+    });
+  };
+
+  const onChangePickTime = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    const timeStemp = Date.parse(currentDate) + "";
+    timeStart ? setTimeEnd(timeStemp) : setTimeStart(timeStemp);
+    // console.log(`start ${timeStart}`)
+    // console.log(`end ${timeEnd}`)
+    // console.log(Date.parse(currentDate));
+    setIsShowDatePicker(!isShowDatePicker);
+  };
+
+  const onPressBooking = () => {
+    //Function Booking
+    if(selectedId){
+      setModalVisible(!modalVisible)
+      // 
+
+    }else {
+      alert("Chua chon thoi gian")
+      return
+    }
+  };
+  const saveOnPress = () => {
+    if(nameCus=="" || phoneCus=="" ){
+      alert(`Dien lai ten hoac SDT`)
+    }else{
+      db.transaction((tx) => {
+        tx.executeSql(
+          "INSERT INTO BookedInfor (TimeID, FieldID , NameCus , PhoneCus ) VALUES (? ,?, ?, ?)",
+          [selectedId, FieldID, nameCus, phoneCus],
+          (_, { rowsAffected }) => {
+            console.log("Insertion result:", rowsAffected);
+            if (rowsAffected > 0) {
+              console.log("Dat san thanh cong.");
+            } else {
+              console.log("Không thể thêm sân vào cơ sở dữ liệu.");
+            }
+          },
+          (_, error) => {
+            console.log("Insertion error:", error);
+          }
+        );
+      });
+      updateStatus(db, selectedId, "false")
+      setModalVisible(!modalVisible)
+    }
+  };
+  const saveTimeDb = () => {
+    if (
+      timeEnd == null ||
+      timeStart == null ||
+      parseFloat(timeEnd) <= parseFloat(timeStart)
+    ) {
+      alert(`Chon thoi gian khong hop li`);
+      return;
+    }
+    setModalAddVisible(!modalAddVisible);
+    db.transaction((tx) => {
+      tx.executeSql(
+        "INSERT INTO TimeFields (FieldID, DayBooking, TimeStart, TimeEnd, Price, Status) VALUES (?, ?, ?, ?, ?, ?)",
+        [FieldID, daySelect+"", timeStart, timeEnd, FieldPrice, "true"],
+        (_, { rowsAffected }) => {
+          console.log("Insertion result:", rowsAffected);
+          if (rowsAffected > 0) {
+            console.log("Sân đã được thêm vào cơ sở dữ liệu.");
+            fetchData();
+          } else {
+            console.log("Không thể thêm sân vào cơ sở dữ liệu.");
+          }
+        },
+        (_, error) => {
+          console.log("Insertion error:", error);
+        }
+      );
+    });
+  };
+
+  const renderItem = ({ item }) => {
+    return (
+      <Item
+        item={item}
+        onPress={(id) => setSelectedId(item.TimeID)}
+        selectedId={selectedId}
+        fetchData={fetchData}
+      />
+    );
+  };
+
+  useEffect(() => {
+    console.log(daySelect);
+    db.transaction((tx) => {
+      tx.executeSql(
+        "CREATE TABLE IF NOT EXISTS TimeFields (TimeID INTEGER PRIMARY KEY AUTOINCREMENT, FieldID INTEGER, DayBooking TEXT, TimeStart TEXT, TimeEnd TEXT, Price TEXT, Status TEXT)",
         []
       );
     });
 
+    db.transaction((tx) => {
+      tx.executeSql(
+        "CREATE TABLE IF NOT EXISTS BookedInfor (BookedID INTEGER PRIMARY KEY AUTOINCREMENT, TimeID INTEGER, FieldID INTEGER, NameCus TEXT, PhoneCus TEXT)",
+        []
+      );
+    });
+
+    // const sql = 'DROP TABLE IF EXISTS TimeFields';
+    // db.transaction(tx => {
+    //   tx.executeSql(sql);
+    // });
+
     //truy xuat data trong bang TimeFields
     fetchData();
-  }, []);
+    console.log(data);
+  }, [daySelect]);
 
   return (
     <View>
@@ -157,7 +353,11 @@ function Booking(props) {
       <CalendarPicker
         minDate={minDate}
         onDateChange={(date) => {
-          setDaySelect(Date.parse(date.toString()));
+          // setDaySelect(date.toString())
+          // setDaySelect(Date.parse(date.toString()));
+          console.log(date);
+          console.log(new Date(date).getTime());
+          setDaySelect(new Date(date).getTime());
         }}
       />
       {isShowDatePicker ? (
@@ -167,7 +367,7 @@ function Booking(props) {
           mode={mode}
           is24Hour={true}
           display="default"
-          onChange={() => {}}
+          onChange={onChangePickTime}
         />
       ) : (
         <View />
@@ -176,46 +376,8 @@ function Booking(props) {
         horizontal={true}
         data={data}
         keyExtractor={(item) => item.key}
-        renderItem={({ item, index }) => {
-          return item.isBooking != true ? (
-            <TouchableOpacity
-              onPress={() => {
-                console.log(timeChecked.current);
-                timeChecked.current = true;
-                data.map((item) => {
-                  item.isBooking != true
-                    ? (item.isBooking = false)
-                    : (item.isBooking = item.isBooking);
-                });
-                data[index].isBooking == null
-                  ? (data[index].isBooking = false)
-                  : (data[index].isBooking = null);
-                const newData = [...data];
-                setData(newData);
-              }}
-              style={{
-                padding: 10,
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
-                opacity: item.isBooking == null ? 0.2 : 1,
-              }}
-            >
-              <Image
-                style={{
-                  width: 50,
-                  height: 50,
-                  resizeMode: "cover",
-                  borderRadius: 25,
-                }}
-                source={images.time}
-              />
-              <Text>{item.time}</Text>
-            </TouchableOpacity>
-          ) : (
-            <View />
-          );
-        }}
+        renderItem={renderItem}
+        extraData={selectedId}
       />
       <View style={{ ustifyContent: "center", alignItems: "center" }}>
         <TouchableOpacity
@@ -234,6 +396,54 @@ function Booking(props) {
           </Text>
         </TouchableOpacity>
       </View>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalAddVisible}
+        onRequestClose={() => {
+          console.log("close");
+        }}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <TouchableOpacity
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => {
+                setTimeStart(null);
+                setIsShowDatePicker(!isShowDatePicker);
+              }}
+            >
+              <Text>Chon gio bat dau</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => {
+                setTimeEnd(null);
+                setIsShowDatePicker(!isShowDatePicker);
+              }}
+            >
+              <Text>Chon gio ket thuc</Text>
+            </TouchableOpacity>
+            <Text>{`start ${timeStart} end ${timeEnd}`}</Text>
+            <View style={{ flexDirection: "row" }}>
+              <Pressable
+                style={[styles.button, styles.buttonClose, styles.colorRed]}
+                onPress={() => setModalAddVisible(!modalAddVisible)}
+              >
+                <Text style={styles.textStyle}>Cancel</Text>
+              </Pressable>
+
+              <Pressable
+                style={[styles.button, styles.buttonClose]}
+                onPress={saveTimeDb}
+              >
+                <Text style={styles.textStyle}>Booking</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
 
       <Modal
         animationType="slide"
@@ -284,17 +494,6 @@ function Booking(props) {
       </Modal>
     </View>
   );
-}
-{
-  /* <CalendarList
-  // Enable horizontal scrolling, default = false
-  horizontal={true}
-  // Enable paging on horizontal, default = false
-  pagingEnabled={true}
-  // Set custom calendarWidth.
-  calendarWidth={Dimensions.get('window').width}
-  calendarHeight={Dimensions.get('window').height*0.4}
-/> */
 }
 const styles = StyleSheet.create({
   centeredView: {

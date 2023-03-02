@@ -14,6 +14,8 @@ import {
   auth,
   onValue,
 } from "../firebase/firebase";
+import * as SQLite from "expo-sqlite";
+
 
 function Booked(props) {
   const AVATAR_SIZE = 70;
@@ -23,31 +25,38 @@ function Booked(props) {
   const [data, setData] = useState([]);
   const { navigation, route } = props;
   const { navigate, goBack } = navigation;
-  useEffect(() => {
-    onValue(
-      firebaseDatabaseRef(firebaseDatabase, "bookingTable"),
-      async (snapshot) => {
-        if (snapshot.exists()) {
-          snapshotObject = snapshot.val();
-          console.log(Object.keys(snapshotObject[auth.currentUser.uid]));
+  const responseUser = auth.currentUser;
 
-          var array = Object.keys(snapshotObject[auth.currentUser.uid]).map(
-            function (key) {
-              return snapshotObject[auth.currentUser.uid][key];
-            }
-          );
-          var listBooked = [];
-          array = array.map((item) => {
-            item.map((i) => {
-              listBooked.push(i);
-            });
-            return [...item];
-          });
-          setData(listBooked);
-          // setData(snapshotObject[auth.currentUser.uid]);
-        }
-      }
-    );
+  const [db, setDb] = useState(SQLite.openDatabase("san.db"));
+
+  const getDataFromDatabase = () => {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        tx.executeSql(
+          "SELECT * FROM BookedInfor INNER JOIN TimeFields ON BookedInfor.TimeID = TimeFields.TimeID INNER JOIN Fields ON TimeFields.FieldID = Fields.FieldID WHERE FieldOwnerID = ?",
+          [responseUser.uid],
+          (_, { rows: { _array } }) => {
+            resolve(_array);
+          },
+          (_, error) => {
+            reject(error);
+          }
+        );
+      });
+    });
+  };
+
+  const fetchData = async () => {
+    try {
+      const data = await getDataFromDatabase();
+      setData(data);
+      console.log(data); // xử lý dữ liệu ở đây
+    } catch (error) {
+      console.log("Lỗi truy vấn cơ sở dữ liệu", error);
+    }
+  };
+  useEffect(() => {
+    fetchData()
   }, []);
   const scrollY = React.useRef(new Animated.Value(0)).current;
 
@@ -100,23 +109,6 @@ function Booked(props) {
                 transform: [{ scale }],
                 opacity: opacity,
               }}
-              // style={{
-              //   marginHorizontal: 10,
-              //   marginVertical: 5,
-              //   flex: 1,
-              //   flexDirection: "row",
-              //   alignItems: "center",
-              //   backgroundColor:'#8d9ac5',
-              //   borderRadius: 10,
-              //   shadowColor: "#000",
-              //   shadowOffset: {
-              //     width: 0,
-              //     height: 2,
-              //   },
-              //   shadowOpacity: 0.25,
-              //   shadowRadius: 4,
-              //   elevation: 5,
-              // }}
             >
               <TouchableOpacity
                 style={{
@@ -139,16 +131,16 @@ function Booked(props) {
                 />
                 <View>
                   <Text style={{ fontSize: 20, fontWeight: "700" }}>
-                    Tên: {item.nameCus}
+                    Tên: {item.NameCus}
                   </Text>
                   <Text style={{ fontSize: 16, opacity: 0.7 }}>
-                    Tên sân: {item.nameField}
+                    Tên sân: {item.FieldName}
                   </Text>
                   <Text style={{ fontSize: 16, opacity: 0.7 }}>
-                    Số điện thoại: {item.phoneCus}
+                    Số điện thoại: {item.PhoneCus}
                   </Text>
                   <Text style={{ fontSize: 16, opacity: 0.7 }}>
-                    Giá: {item.priceField}
+                    Giá: {item.Price}
                   </Text>
                   {/* <Text style={{ fontSize: 16, opacity: 0.7 }}>
                   Thời gian: {item.daySelect}
