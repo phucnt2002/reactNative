@@ -89,7 +89,7 @@ function DetailBooked(props) {
           }}
         >
           <Text style={{ fontSize: 20, fontWeight: "700", marginVertical: 10 }}>
-            Tên khách hàng: {booked.nameCus}
+            Tên khách hàng: {booked.NameCus}
           </Text>
           <Text
             style={{
@@ -99,7 +99,7 @@ function DetailBooked(props) {
               marginHorizontal: 15,
             }}
           >
-            Tên sân: {booked.nameField}
+            Tên sân: {booked.FieldName}
           </Text>
           <Text
             style={{
@@ -109,7 +109,7 @@ function DetailBooked(props) {
               marginHorizontal: 15,
             }}
           >
-            Số điện thoại: {booked.phoneCus}
+            Số điện thoại: {booked.PhoneCus}
           </Text>
           <Text
             style={{
@@ -119,7 +119,7 @@ function DetailBooked(props) {
               marginHorizontal: 15,
             }}
           >
-            Giá: {booked.priceField + "000VND"}
+            Giá: {booked.Price + "000VND"}
           </Text>
           <Text
             style={{
@@ -129,7 +129,7 @@ function DetailBooked(props) {
               marginHorizontal: 15,
             }}
           >
-            Ngày: {daySelect}
+            {new Date(parseFloat(booked.TimeStart)).toLocaleString()+"-"+new Date(parseFloat(booked.TimeEnd)).toLocaleString()}
           </Text>
         </View>
       </ImageBackground>
