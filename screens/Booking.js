@@ -183,8 +183,8 @@ function Booking(props) {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
         tx.executeSql(
-          "SELECT * FROM TimeFields WHERE FieldID = ? AND DayBooking = ? AND Status =?",
-          [FieldID, daySelect+"", "true"],
+          "SELECT * FROM TimeFields WHERE FieldID = ? AND DayBooking = ?",
+          [FieldID, daySelect+""],
           (_, { rows: { _array } }) => {
             resolve(_array);
           },
