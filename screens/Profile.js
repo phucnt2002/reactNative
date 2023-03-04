@@ -14,7 +14,7 @@ import {
   StyleSheet,
   Animated,
   Dimensions,
-  StatusBar
+  StatusBar,
 } from "react-native";
 import { images, colors, icons, fontSizes } from "../constants";
 import Icon from "react-native-vector-icons/FontAwesome5";
@@ -50,21 +50,24 @@ export default function Profile() {
   const RADIUS = AVATAR_SIZE / 2;
   const ITEM_SIZE = AVATAR_SIZE + SPACING * 3;
   const scrollY = React.useRef(new Animated.Value(0)).current;
-  const [currentTimeStemp, setCurrentTimeStemp] = useState(new Date().getTime())
+  const [currentTimeStemp, setCurrentTimeStemp] = useState(
+    new Date().getTime()
+  );
 
   const responseUser = auth.currentUser;
 
-
   const [data, setData] = useState([]);
+  const [text, setText] = useState("");
 
   const [db, setDb] = useState(SQLite.openDatabase("san.db"));
 
   const getDataFromDatabase = () => {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
+        console.log(currentTimeStemp);
         tx.executeSql(
-          "SELECT * FROM TimeFields INNER JOIN Fields ON TimeFields.FieldID = Fields.FieldID WHERE FieldOwnerID = ? AND Status = ? AND CAST(DayBooking AS INTEGER) > ?",
-          [responseUser.uid, "true", currentTimeStemp],
+          "SELECT * FROM TimeFields INNER JOIN Fields ON TimeFields.FieldID = Fields.FieldID WHERE FieldOwnerID = ? AND Status = ? ",
+          [responseUser.uid, "true"],
           (_, { rows: { _array } }) => {
             resolve(_array);
           },
@@ -79,107 +82,151 @@ export default function Profile() {
   const fetchData = async () => {
     try {
       const data = await getDataFromDatabase();
-      setData(data);
+      const filteredTimeslots = [];
+      data.map((item) => {
+        // console.log(new Date(parseFloat(item.TimeStart)).toString(),  parseFloat(Date.now()))
+        if (parseFloat(item.DayBooking) > parseFloat(Date.now())) {
+          if (text == "") {
+            filteredTimeslots.push(item);
+          } else {
+            const newStr = text
+              .replace(/[\u0300-\u036f]/g, "") // Xóa dấu sắc, huyền, ngã, hỏi, nặng
+              .toLowerCase();
+            const newFieldName = item.FieldName.replace(/[\u0300-\u036f]/g, "") // Xóa dấu sắc, huyền, ngã, hỏi, nặng
+              .toLowerCase();
+            const newFieldType = item.FieldType.replace(/[\u0300-\u036f]/g, "") // Xóa dấu sắc, huyền, ngã, hỏi, nặng
+              .toLowerCase();
+            if (newFieldType.includes(newStr)||newFieldName.includes(newStr)) {
+              filteredTimeslots.push(item);
+            }
+          }
+        }
+      });
+      console.log(filteredTimeslots);
+      setData(filteredTimeslots);
       console.log(data); // xử lý dữ liệu ở đây
     } catch (error) {
       console.log("Lỗi truy vấn cơ sở dữ liệu", error);
     }
   };
   useEffect(() => {
-    fetchData()
-    console.log(data)
-  }, []);
+    fetchData();
+    console.log(data);
+  }, [text]);
   return (
-    <Animated.FlatList
-      data={data}
-      onScroll={Animated.event(
-        [
-          {
-            nativeEvent: {
-              contentOffset: {
-                y: scrollY,
+    <>
+      <TextInput
+        style={styles.input}
+        placeholder={"Enter the Name Field or Type Field"}
+        value={text}
+        onChangeText={(value) => {
+          setText(value);
+        }}
+        placeholderTextColor="#ccc"
+      />
+      <Animated.FlatList
+        data={data}
+        onScroll={Animated.event(
+          [
+            {
+              nativeEvent: {
+                contentOffset: {
+                  y: scrollY,
+                },
               },
             },
-          },
-        ],
-        { useNativeDriver: true } // Add this line
-      )}
-      keyExtractor={(item) => item.key}
-      contentContainerStyle={{
-        padding: SPACING,
-        paddingTop: StatusBar.currentHeight || 42,
-      }}
-      renderItem={({ item, index }) => {
-        const scale = scrollY.interpolate({
-          inputRange: [-1, 0, ITEM_SIZE * index, ITEM_SIZE * (index + 2)],
-          outputRange: [1, 1, 1, 0],
-        });
-        const opacity = scrollY.interpolate({
-          inputRange: [-1, 0, ITEM_SIZE * index, ITEM_SIZE * (index + 0.5)],
-          outputRange: [1, 1, 1, 0],
-        });
-        return (
-          <Animated.View
-            style={{
-              flexDirection: "row",
-              backgroundColor: "white",
-              backgroundColor: "#ededed",
-              // padding: SPACING,
-              marginBottom: SPACING - 5,
-              borderRadius: 16,
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 10 },
-              shadowOpacity: 0.3,
-              shadowRadius: 20,
-              elevation: 5,
-              transform: [{ scale }],
-              opacity: opacity,
-            }}
-          >
-            <TouchableOpacity
+          ],
+          { useNativeDriver: true } // Add this line
+        )}
+        keyExtractor={(item) => item.key}
+        contentContainerStyle={{
+          padding: SPACING,
+          paddingTop: StatusBar.currentHeight || 42,
+        }}
+        renderItem={({ item, index }) => {
+          const scale = scrollY.interpolate({
+            inputRange: [-1, 0, ITEM_SIZE * index, ITEM_SIZE * (index + 2)],
+            outputRange: [1, 1, 1, 0],
+          });
+          const opacity = scrollY.interpolate({
+            inputRange: [-1, 0, ITEM_SIZE * index, ITEM_SIZE * (index + 0.5)],
+            outputRange: [1, 1, 1, 0],
+          });
+          return (
+            <Animated.View
               style={{
                 flexDirection: "row",
-                width: "100%",
-                padding: SPACING,
-              }}
-              onPress={() => {
+                backgroundColor: "white",
+                backgroundColor: "#ededed",
+                // padding: SPACING,
+                marginBottom: SPACING - 5,
+                borderRadius: 16,
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 10 },
+                shadowOpacity: 0.3,
+                shadowRadius: 20,
+                elevation: 5,
+                transform: [{ scale }],
+                opacity: opacity,
               }}
             >
-              <Image
-                source={{
-                  uri: "https://vecgroup.vn/upload_images/images/2021/12/09/kich-thuoc-san-bong-11-nguoi(1).png",
+              <TouchableOpacity
+                style={{
+                  flexDirection: "row",
+                  width: "100%",
+                  padding: SPACING,
+                  justifyContent: "center",
+                  alignItems: "center",
                 }}
-                style={{ width: 80, height: 60, margin: 5 }}
-              />
-              <View>
-                <Text
-                  style={{
-                    color: "#5567c9",
-                    textTransform: "uppercase",
-                    fontWeight: "bold",
-                    margin: 5,
+                onPress={() => {}}
+              >
+                <Image
+                  source={{
+                    uri: "https://vecgroup.vn/upload_images/images/2021/12/09/kich-thuoc-san-bong-11-nguoi(1).png",
                   }}
-                >{`Tên sân: ${item.FieldName}`}</Text>
-                <Text
-                  style={{ marginLeft: 5 }}
-                >{`Loại sân: ${item.FieldType}`}</Text>
-                <Text
-                  style={{ marginLeft: 5 }}
-                >{`Giá: ${item.FieldPrice}k`}</Text>
-                <Text style={{ marginLeft: 5 }}>
-                  {`Thoi gian: ${new Date(
-                    parseFloat(item.TimeStart)
-                  ).toLocaleString()} - ${new Date(
-                    parseFloat(item.TimeEnd)
-                  ).toLocaleString()}`}
-                </Text>
-              </View>
-            </TouchableOpacity>
-          </Animated.View>
-        );
-      }}
-      showsHorizontalScrollIndicator={false}
-    />
+                  style={{ width: 80, height: 60, margin: 5 }}
+                />
+                <View>
+                  <Text
+                    style={{
+                      color: "#5567c9",
+                      textTransform: "uppercase",
+                      fontWeight: "bold",
+                      margin: 5,
+                    }}
+                  >{`Tên sân: ${item.FieldName}`}</Text>
+                  <Text
+                    style={{ marginLeft: 5 }}
+                  >{`Loại sân: ${item.FieldType}`}</Text>
+                  <Text
+                    style={{ marginLeft: 5 }}
+                  >{`Giá: ${item.FieldPrice}k`}</Text>
+                  <Text style={{ marginLeft: 5 }}>
+                    {`Ngay: ${new Date(
+                      parseFloat(item.DayBooking)
+                    ).getDate()}/${new Date(
+                      parseFloat(item.DayBooking)
+                    ).getMonth()}/${new Date(
+                      parseFloat(item.DayBooking)
+                    ).getFullYear()}`}
+                  </Text>
+                  <Text style={{ marginLeft: 5 }}>{`Khung gio: ${new Date(
+                    Number(item.TimeStart)
+                  ).getHours()}:${new Date(
+                    Number(item.TimeStart)
+                  ).getMinutes()} - ${new Date(
+                    Number(item.TimeEnd)
+                  ).getHours()}:${new Date(
+                    Number(item.TimeEnd)
+                  ).getMinutes()}`}</Text>
+                </View>
+              </TouchableOpacity>
+            </Animated.View>
+          );
+        }}
+        showsHorizontalScrollIndicator={false}
+      />
+    </>
   );
 }
 
@@ -302,5 +349,14 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     marginTop: 3,
     marginRight: 20,
+  },
+  input: {
+    height: 40,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    marginVertical: 10,
+    color: "#333",
   },
 });
