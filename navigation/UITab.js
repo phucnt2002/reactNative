@@ -43,7 +43,7 @@ const screenOptions = ({ route }) => ({
             : route.name == "Chart"
             ? "chart-line"
             : route.name == "Profile"
-            ? "user"
+            ? "stack-overflow"
             : ""
         }
         size={23}
@@ -100,7 +100,7 @@ function UITab(props) {
         name={"Profile"}
         component={Profile}
         options={{
-          tabBarLabel: "Profile",
+          tabBarLabel: "Available",
           tabBarLabelStyle: {
             fontSize: fontSizes.h6,
           },

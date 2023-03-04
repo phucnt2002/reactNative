@@ -74,7 +74,6 @@ function Item({ item, onPress, selectedId, fetchData }) {
   const isSelected = item.TimeID === selectedId;
   const opacity = isSelected ? 0.3 : 1;
 
-
   const deleteRow = (db, timeId) => {
     db.transaction((tx) => {
       tx.executeSql(
@@ -89,11 +88,10 @@ function Item({ item, onPress, selectedId, fetchData }) {
   return (
     <TouchableOpacity
       onPress={() => {
-        console.log(item);
         onPress(item.id);
+        console.log(item)
       }}
       onLongPress={() => {
-        debugger;
         Alert.alert(
           "Xóa sân",
           `Bạn có chắc chắn xóa sân ${item.nameField}?`,
@@ -183,8 +181,8 @@ function Booking(props) {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
         tx.executeSql(
-          "SELECT * FROM TimeFields WHERE FieldID = ? AND DayBooking = ?",
-          [FieldID, daySelect+""],
+          "SELECT * FROM TimeFields WHERE FieldID = ? AND DayBooking = ? AND Status = ?",
+          [FieldID, daySelect + "", "true"],
           (_, { rows: { _array } }) => {
             resolve(_array);
           },
@@ -212,7 +210,6 @@ function Booking(props) {
     setTimeEnd(null);
   };
 
-
   const updateStatus = (db, timeId, newStatus) => {
     db.transaction((tx) => {
       tx.executeSql(
@@ -225,30 +222,30 @@ function Booking(props) {
   };
 
   const onChangePickTime = (event, selectedDate) => {
+    //click ok in calendar
+    console.log(Date(selectedDate).toString(), Date(date).toString());
     const currentDate = selectedDate || date;
     const timeStemp = Date.parse(currentDate) + "";
     timeStart ? setTimeEnd(timeStemp) : setTimeStart(timeStemp);
-    // console.log(`start ${timeStart}`)
-    // console.log(`end ${timeEnd}`)
-    // console.log(Date.parse(currentDate));
+    console.log(`start ${timeStart}`)
+    console.log(`end ${timeEnd}`)
     setIsShowDatePicker(!isShowDatePicker);
   };
 
   const onPressBooking = () => {
     //Function Booking
-    if(selectedId){
-      setModalVisible(!modalVisible)
-      // 
-
-    }else {
-      alert("Chua chon thoi gian")
-      return
+    if (selectedId) {
+      setModalVisible(!modalVisible);
+      //
+    } else {
+      alert("Chua chon thoi gian");
+      return;
     }
   };
   const saveOnPress = () => {
-    if(nameCus=="" || phoneCus=="" ){
-      alert(`Dien lai ten hoac SDT`)
-    }else{
+    if (nameCus == "" || phoneCus == "") {
+      alert(`Dien lai ten hoac SDT`);
+    } else {
       db.transaction((tx) => {
         tx.executeSql(
           "INSERT INTO BookedInfor (TimeID, FieldID , NameCus , PhoneCus ) VALUES (? ,?, ?, ?)",
@@ -266,8 +263,8 @@ function Booking(props) {
           }
         );
       });
-      updateStatus(db, selectedId, "false")
-      setModalVisible(!modalVisible)
+      updateStatus(db, selectedId, "false");
+      setModalVisible(!modalVisible);
     }
   };
   const saveTimeDb = () => {
@@ -283,7 +280,7 @@ function Booking(props) {
     db.transaction((tx) => {
       tx.executeSql(
         "INSERT INTO TimeFields (FieldID, DayBooking, TimeStart, TimeEnd, Price, Status) VALUES (?, ?, ?, ?, ?, ?)",
-        [FieldID, daySelect+"", timeStart, timeEnd, FieldPrice, "true"],
+        [FieldID, daySelect + "", timeStart, timeEnd, FieldPrice, "true"],
         (_, { rowsAffected }) => {
           console.log("Insertion result:", rowsAffected);
           if (rowsAffected > 0) {
