@@ -68,6 +68,7 @@ LocaleConfig.locales["fr"] = {
 };
 LocaleConfig.defaultLocale = "fr";
 import * as SQLite from "expo-sqlite";
+import Icon from "react-native-fontawesome";
 
 function Item({ item, onPress, selectedId, fetchData }) {
   const [db, setDb] = useState(SQLite.openDatabase("san.db"));
@@ -91,27 +92,28 @@ function Item({ item, onPress, selectedId, fetchData }) {
         onPress(item.id);
         console.log(item)
       }}
-      onLongPress={() => {
-        Alert.alert(
-          "Xóa sân",
-          `Bạn có chắc chắn xóa sân ${item.nameField}?`,
-          [
-            {
-              text: "No",
-              onPress: () => console.log("Cancel Pressed"),
-              style: "cancel",
-            },
-            {
-              text: "Yes",
-              onPress: () => {
-                deleteRow(db, item.TimeID);
-              },
-            },
-          ],
-          { cancelable: true }
-        );
-      }}
+      // onLongPress={() => {
+      //   Alert.alert(
+      //     "Xóa sân",
+      //     `Bạn có chắc chắn xóa sân ${item.nameField}?`,
+      //     [
+      //       {
+      //         text: "No",
+      //         onPress: () => console.log("Cancel Pressed"),
+      //         style: "cancel",
+      //       },
+      //       {
+      //         text: "Yes",
+      //         onPress: () => {
+      //           deleteRow(db, item.TimeID);
+      //         },
+      //       },
+      //     ],
+      //     { cancelable: true }
+      //   );
+      // }}
       style={{
+        // backgroundColor: 'red',
         padding: 10,
         flex: 1,
         justifyContent: "center",
@@ -177,6 +179,7 @@ function Booking(props) {
 
   const [selectedId, setSelectedId] = useState(null);
 
+  var timeStart_ = new Date(timeStart).toLocaleDateString()
   const getDataFromDatabase = () => {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
@@ -405,7 +408,7 @@ function Booking(props) {
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
             <TouchableOpacity
-              style={[styles.button, styles.buttonClose]}
+              style={[styles.button, styles.buttonClose, { margin: 10 }]}
               onPress={() => {
                 setTimeStart(null);
                 setIsShowDatePicker(!isShowDatePicker);

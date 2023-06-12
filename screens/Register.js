@@ -80,11 +80,11 @@ function Register(props) {
         </View>
         <View style={{
             flex: 40,
-            backgroundColor: '#001949',
+            // backgroundColor: '#001949',
             padding: 10,
             margin: 10,
-            borderRadius: 20,
-            shadowColor: '#000',
+            // borderRadius: 20,
+            // shadowColor: '#000',
             shadowOffset: { width: 1, height: 1 },
             shadowOpacity:  0.4,
             shadowRadius: 3,
@@ -95,7 +95,7 @@ function Register(props) {
             }}>
                 <Text style={{
                     fontSize: 18,
-                    color: 'white',
+                    color: 'black',
                     marginTop: 25
                 }}>Email:</Text>
                 <TextInput
@@ -112,7 +112,7 @@ function Register(props) {
                        setEmail(text)    
                     }}
                     style={{
-                        color: 'white',
+                        color: 'black',
                         marginTop: 5
                     }}
                     placeholder='example@gmail.com'
@@ -137,16 +137,16 @@ function Register(props) {
             }}>
                 <Text style={{
                     fontSize: 18,
-                    color: 'white'
+                    color: 'black'
                 }}>Password:</Text>
                 <TextInput
                     onChangeText={(text)=>{
                         setErrorPassword(isValidPassword(text) == true ? 
-                                    '' : 'Password must be at least 3 characters')
+                                    '' : 'Password must have at least 8 characters, 1 special character, 1 capital letter, and 1 number')
                         setPassword(text)    
                     }}
                     style={{
-                        color: 'white'
+                        color: 'black'
                     }}
                     secureTextEntry={true}
                     value={password}
@@ -171,16 +171,16 @@ function Register(props) {
             }}>
                 <Text style={{
                     fontSize: 18,
-                    color: 'white'
+                    color: 'black'
                 }}>Retype password:</Text>
                 <TextInput
                     onChangeText={(text)=>{
                         setErrorPassword(isValidPassword(text) == true ? 
-                                    '' : 'Password must be at least 3 characters')
+                                    '' : 'Password not match')
                         setRetypePassword(text)                                    
                     }}
                     style={{
-                        color: 'white'
+                        color: 'black'
                     }}
                     value={retypePassword}
                     secureTextEntry={true}

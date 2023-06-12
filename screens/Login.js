@@ -30,7 +30,7 @@ function Login(props) {
     const [errorPassword, setErrorPassword] = useState('')
     //states to store email/password
     const [email, setEmail] = useState('nguyenphuc2002ok@gmail.com')
-    const [password, setPassword] = useState('123456Abc')
+    const [password, setPassword] = useState('12345678@A')
     const isValidationOK = () => email.length > 0 && password.length > 0
                             && isValidEmail(email) == true
                             && isValidPassword(password) == true
@@ -103,15 +103,15 @@ function Login(props) {
         </View>
         <View style={{
             flex: 30,
-            backgroundColor: '#E17A8D',
+            // backgroundColor: '#E17A8D',
             padding: 10,
             margin: 10,
-            borderRadius: 20,
-            shadowColor: '#000',
-            shadowOffset: { width: 1, height: 1 },
-            shadowOpacity:  0.4,
-            shadowRadius: 3,
-            elevation: 5,
+            // borderRadius: 20,
+            // shadowColor: '#000',
+            // shadowOffset: { width: 1, height: 1 },
+            // shadowOpacity:  0.4,
+            // shadowRadius: 3,
+            // elevation: 5,
         }}>
             <View style={{
                 marginHorizontal: 15
@@ -165,7 +165,7 @@ function Login(props) {
                 <TextInput
                     onChangeText={(text)=>{
                         setErrorPassword(isValidPassword(text) == true ? 
-                                    '' : 'Password must be at least 3 characters')
+                                    '' : 'Password must have at least 8 characters, 1 special character, 1 capital letter, and 1 number')
                         setPassword(text)    
                     }}
                     style={{

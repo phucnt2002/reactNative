@@ -29,6 +29,8 @@ import * as SQLite from "expo-sqlite";
 import * as Sharing from "expo-sharing";
 import * as FileSystem from "expo-file-system";
 import * as DocumentPicker from "expo-document-picker";
+import Icon from 'react-native-vector-icons/FontAwesome5'
+
 
 export default function FlatListSan(props) {
   props = props.props;
@@ -62,7 +64,7 @@ export default function FlatListSan(props) {
   const { navigation, route } = props;
   const { navigate, goBack } = navigation;
 
-  const saveOnPress = () => {};
+  const saveOnPress = () => { };
 
   const exportDb = async () => {
     if (Platform.OS === "android") {
@@ -320,26 +322,26 @@ export default function FlatListSan(props) {
                 onPress={() => {
                   navigate("Booking", { san: item, index: index });
                 }}
-                onLongPress={() => {
-                  Alert.alert(
-                    "Xóa sân",
-                    `Bạn có chắc chắn xóa sân ${item.FieldName}?`,
-                    [
-                      {
-                        text: "No",
-                        onPress: () => console.log("Cancel Pressed"),
-                        style: "cancel",
-                      },
-                      {
-                        text: "Yes",
-                        onPress: () => {
-                          deleteItem(index);
-                        },
-                      },
-                    ],
-                    { cancelable: true }
-                  );
-                }}
+              // onLongPress={() => {
+              //   Alert.alert(
+              //     "Xóa sân",
+              //     `Bạn có chắc chắn xóa sân ${item.FieldName}?`,
+              //     [
+              //       {
+              //         text: "No",
+              //         onPress: () => console.log("Cancel Pressed"),
+              //         style: "cancel",
+              //       },
+              //       {
+              //         text: "Yes",
+              //         onPress: () => {
+              //           deleteItem(index);
+              //         },
+              //       },
+              //     ],
+              //     { cancelable: true }
+              //   );
+              // }}
               >
                 <Image
                   source={{
@@ -363,7 +365,33 @@ export default function FlatListSan(props) {
                     style={{ marginLeft: 5 }}
                   >{`Giá: ${item.FieldPrice}k`}</Text>
                 </View>
+
+                <TouchableOpacity style={{ marginLeft: 50 }}
+                  onPress={() => {
+                    Alert.alert(
+                      "Xóa sân",
+                      `Bạn có chắc chắn xóa sân ${item.FieldName}?`,
+                      [
+                        {
+                          text: "No",
+                          onPress: () => console.log("Cancel Pressed"),
+                          style: "cancel",
+                        },
+                        {
+                          text: "Yes",
+                          onPress: () => {
+                            deleteItem(index);
+                          },
+                        },
+                      ],
+                      { cancelable: true }
+                    );
+                  }}
+                >
+                  <Icon name={"trash"} style={{ padding: 10 }} size={20}></Icon>
+                </TouchableOpacity>
               </TouchableOpacity>
+
             </Animated.View>
           );
         }}

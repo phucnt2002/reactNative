@@ -20,6 +20,8 @@ import { isValidEmail, isValidPassword } from "../utilies/Validations";
 import { UIHeader } from "../components";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { FlatListSan } from "../components";
+import * as SQLite from "expo-sqlite";
+
 import {
   LineChart,
   BarChart,
@@ -39,6 +41,8 @@ import {
   onValue,
   update,
 } from "../firebase/firebase";
+import { useFocusEffect } from '@react-navigation/native';
+
 const chartConfigs = [
   {
     backgroundColor: "#000000",
@@ -124,64 +128,138 @@ function Chart(props) {
   const bookingTableDS = useRef();
   const [labels, setLabels] = useState();
   const [data, setData] = useState();
-  const datasets = useRef();
+  const [datasets, setDatasets] = useState();
   const [labelChart, setLabelChart] = useState();
-  useEffect(() => {
-    onValue(
-      firebaseDatabaseRef(firebaseDatabase, "bookingTable"),
-      async (snapshot) => {
-        if (snapshot.exists()) {
-          snapshotObject = snapshot.val();
-          bookingTableDS.current = snapshotObject[auth.currentUser.uid];
-          setData(bookingTableDS.current);
-          var listTime = [];
-          var arr = Object.keys(bookingTableDS.current);
-          arr.sort((a, b)=>{
-            parseFloat(a) - parseFloat(b)
-          })
-          arr.map((item) => {
-            var a = new Date(parseInt(item));
-            // listTime.push(a.toLocaleDateString("en-US"));
-            listTime.push(a.getDate()+"/"+(a.getMonth()+1));
-          });
-          setLabels(arr);
-          setLabelChart(listTime);
-        }
+  const [db, setDb] = useState(SQLite.openDatabase("san.db"));
+  const responseUser = auth.currentUser;
+  
+
+  useFocusEffect(
+    React.useCallback(() => {
+      // Code to be run when the screen receives focus for the second time
+      console.log('Main screen received focus');
+      fetchData();
+      // ...
+
+      return () => {
+        // Code to be run when the screen loses focus
+        console.log('Main screen lost focus');
+        // ...
+      };
+    }, [])
+  );
+
+  const fetchData = async () => {
+    try {
+      const data = await getDataFromDatabase();
+      console.log(data); // Check if the data is fetched correctly
+  
+      // Process the data
+      const processedData = processChartData(data); // Define a function to process the data
+  
+      // Set the processed data as the chart data
+      setData(processedData);
+  
+      // Update the labels and datasets
+      const labels = processedData.map((item) => item.label);
+      const datasets = [
+        {
+          data: processedData.map((item) => item.value),
+        },
+      ];
+      setLabels(labels);
+      setDatasets(datasets);
+    } catch (error) {
+      console.log("Lỗi truy vấn cơ sở dữ liệu", error);
+    }
+  };
+
+  const processChartData = (data) => {
+    const chartData = [];
+  
+    // Create an object to store the accumulated price for each date
+    const accumulatedData = {};
+  
+    // Iterate over the data array
+    for (const item of data) {
+      const date = new Date(parseInt(item.DayBooking)).toLocaleDateString();
+      const price = parseFloat(item.Price);
+  
+      // Check if the date already exists in the accumulatedData object
+      if (accumulatedData[date]) {
+        // If the date exists, add the price to the accumulated value
+        accumulatedData[date] += price;
+      } else {
+        // If the date doesn't exist, initialize it with the current price
+        accumulatedData[date] = price;
       }
-    );
-  }, []);
-  console.log(labels);
-  console.log(datasets);
-  // console.log(refLables.current);
-  if (labels != undefined) {
-    let listPriceDay = []; // price per day
-    labels.map((item) => {
-      const listDataDay = data[item];
-      var sum = listDataDay.reduce(function (a, b) {
-        return parseInt(a) + parseInt(b.priceField);
-      }, 0);
-      listPriceDay.push(sum);
-      // listDataDay.map((item)=>console.log(item))
-      // listDataDay.push(sum)
+    }
+  
+    // Iterate over the accumulatedData object and create chart data
+    for (const date in accumulatedData) {
+      const label = date;
+      const value = accumulatedData[date];
+      chartData.push({ label, value });
+    }
+  
+    return chartData;
+  };
+  
+
+  const getDataFromDatabase = () => {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        tx.executeSql(
+          "SELECT * FROM Fields inner join TimeFields on Fields.FieldID = TimeFields.FieldID  WHERE Fields.FieldOwnerID = ? and TimeFields.Status = ? ORDER BY TimeFields.TimeStart",
+          [responseUser.uid, "false"],
+          (_, { rows: { _array } }) => {
+            resolve(_array);
+          },
+          (_, error) => {
+            reject(error);
+          }
+        );
+      });
     });
-    datasets.current = listPriceDay;
-    // console.log(listDataDay)
-  }
+  };
+
+  useEffect(() => {
+    // onValue(
+    //   firebaseDatabaseRef(firebaseDatabase, "bookingTable"),
+    //   async (snapshot) => {
+    //     if (snapshot.exists()) {
+    //       snapshotObject = snapshot.val();
+    //       bookingTableDS.current = snapshotObject[auth.currentUser.uid];
+    //       setData(bookingTableDS.current);
+    //       var listTime = [];
+    //       var arr = Object.keys(bookingTableDS.current);
+    //       arr.sort((a, b)=>{
+    //         parseFloat(a) - parseFloat(b)
+    //       })
+    //       arr.map((item) => {
+    //         var a = new Date(parseInt(item));
+    //         listTime.push(a.getDate()+"/"+(a.getMonth()+1));
+    //       });
+    //       setLabels(arr);
+    //       setLabelChart(listTime);
+    //     }
+    //   }
+    // );
+  }, []);
+
 
   const dataChart = {
-    labels: labelChart,
-    datasets: [
-      {
-        data: datasets.current,
-      },
-    ],
+    labels: labels,
+    datasets: datasets,
   };
-  console.log(datasets.current);
+
+  console.log(dataChart)
+
   const graphStyle = {
     marginVertical: 8,
     ...chartConfig.style,
   };
-  return datasets.current != undefined ? (
+  return datasets != undefined ? (
     <View
       style={{
         flex: 1,
@@ -195,7 +273,6 @@ function Chart(props) {
         data={dataChart}
         width={Dimensions.get("window").width * 0.9} // from react-native
         height={220}
-        // yAxisLabel="$"
         yAxisSuffix="k"
         yAxisInterval={1} // optional, defaults to 1
         chartConfig={{
