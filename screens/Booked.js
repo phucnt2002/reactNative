@@ -15,6 +15,7 @@ import {
   onValue,
 } from "../firebase/firebase";
 import * as SQLite from "expo-sqlite";
+import { useFocusEffect } from '@react-navigation/native';
 
 
 function Booked(props) {
@@ -55,6 +56,20 @@ function Booked(props) {
       console.log("Lỗi truy vấn cơ sở dữ liệu", error);
     }
   };
+  useFocusEffect(
+    React.useCallback(() => {
+      // Code to be run when the screen receives focus for the second time
+      console.log('Main screen received focus');
+      fetchData();
+      // ...
+
+      return () => {
+        // Code to be run when the screen loses focus
+        console.log('Main screen lost focus');
+        // ...
+      };
+    }, [])
+  );
   useEffect(() => {
     fetchData()
   }, []);

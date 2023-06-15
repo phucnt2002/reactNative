@@ -23,6 +23,7 @@ import { UIHeader } from "../components";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { FlatListSan } from "../components";
 import * as SQLite from "expo-sqlite";
+import { useFocusEffect } from '@react-navigation/native';
 
 import {
   LineChart,
@@ -61,6 +62,21 @@ export default function Profile() {
 
   const [db, setDb] = useState(SQLite.openDatabase("san.db"));
 
+  useFocusEffect(
+    React.useCallback(() => {
+      // Code to be run when the screen receives focus for the second time
+      console.log('Main screen received focus');
+      fetchData();
+      // ...
+
+      return () => {
+        // Code to be run when the screen loses focus
+        console.log('Main screen lost focus');
+        // ...
+      };
+    }, [])
+  );
+
   const getDataFromDatabase = () => {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
@@ -85,7 +101,7 @@ export default function Profile() {
       const filteredTimeslots = [];
       data.map((item) => {
         // console.log(new Date(parseFloat(item.TimeStart)).toString(),  parseFloat(Date.now()))
-        if (parseFloat(item.DayBooking) > parseFloat(Date.now())) {
+        if (true) {
           if (text == "") {
             filteredTimeslots.push(item);
           } else {
