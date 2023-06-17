@@ -100,24 +100,22 @@ export default function Profile() {
       const data = await getDataFromDatabase();
       const filteredTimeslots = [];
       data.map((item) => {
-        // console.log(new Date(parseFloat(item.TimeStart)).toString(),  parseFloat(Date.now()))
-        if (true) {
-          if (text == "") {
+        if (text === "") {
+          filteredTimeslots.push(item);
+        } else {
+          const newStr = text
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase();
+          const newFieldName = item.FieldName.replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase();
+          const newFieldType = item.FieldType.replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase();
+          if (newFieldType.includes(newStr) || newFieldName.includes(newStr)) {
             filteredTimeslots.push(item);
-          } else {
-            const newStr = text
-              .replace(/[\u0300-\u036f]/g, "") // Xóa dấu sắc, huyền, ngã, hỏi, nặng
-              .toLowerCase();
-            const newFieldName = item.FieldName.replace(/[\u0300-\u036f]/g, "") // Xóa dấu sắc, huyền, ngã, hỏi, nặng
-              .toLowerCase();
-            const newFieldType = item.FieldType.replace(/[\u0300-\u036f]/g, "") // Xóa dấu sắc, huyền, ngã, hỏi, nặng
-              .toLowerCase();
-            if (newFieldType.includes(newStr)||newFieldName.includes(newStr)) {
-              filteredTimeslots.push(item);
-            }
           }
         }
       });
+      
       console.log(filteredTimeslots);
       setData(filteredTimeslots);
       console.log(data); // xử lý dữ liệu ở đây

@@ -33,6 +33,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5'
 
 
 export default function FlatListSan(props) {
+  // const { item, index, deleteItem, onPress } = props;
   props = props.props;
   const AVATAR_SIZE = 70;
   const SPACING = 20;
@@ -65,6 +66,29 @@ export default function FlatListSan(props) {
   const { navigate, goBack } = navigation;
 
   const saveOnPress = () => { };
+
+  const deleteItem = (index) => {
+    const field = data[index];
+  
+    db.transaction((tx) => {
+      tx.executeSql(
+        "DELETE FROM Fields WHERE FieldID = ?",
+        [field.FieldID],
+        (_, { rowsAffected }) => {
+          if (rowsAffected > 0) {
+            const newData = [...data];
+            newData.splice(index, 1);
+            setData(newData);
+            console.log(`Field ${field.FieldName} deleted successfully.`);
+          }
+        },
+        (_, error) => {
+          console.log("Deletion error:", error);
+        }
+      );
+    });
+  };
+  
 
   const exportDb = async () => {
     if (Platform.OS === "android") {

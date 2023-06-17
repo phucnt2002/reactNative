@@ -425,7 +425,7 @@ function Booking(props) {
             >
               <Text>Chon gio ket thuc</Text>
             </TouchableOpacity>
-            <Text>{`start ${timeStart} end ${timeEnd}`}</Text>
+            {/* <Text>{`start ${timeStart} end ${timeEnd}`}</Text> */}
             <View style={{ flexDirection: "row" }}>
               <Pressable
                 style={[styles.button, styles.buttonClose, styles.colorRed]}
@@ -438,7 +438,7 @@ function Booking(props) {
                 style={[styles.button, styles.buttonClose]}
                 onPress={saveTimeDb}
               >
-                <Text style={styles.textStyle}>Booking</Text>
+                <Text style={styles.textStyle}>Create</Text>
               </Pressable>
             </View>
           </View>
